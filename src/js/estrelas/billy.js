@@ -27,6 +27,8 @@ definirEstrela({
             nome: 'Dar no Pé',
             tipo: 'passiva',
             descricao: 'Sempre que Billy sofrer dano de uma Jogada de Ataque, ele pode se mover uma zona.',
+            resumo: 'Ao sofrer dano de uma Jogada de Ataque, pode se mover 1 zona.',
+            visual: { e: 'proprio', c: '#d6b38a', x: 'aura' },
             // Não gasta movimento e não conta como movimento voluntário (não aciona Machadada nem Compelir).
             gatilho: { evento: 'sofreuDano', condicao: (c) => Engine.ehAtaque(c.habilidade) },
             alvo: { tipo: 'zona', alcance: 1, livre: true, opcional: true },
@@ -38,6 +40,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Billy demonstra sua maestria como pistoleiro e realiza uma Jogada de Ataque contra duas Estrelas inimigas diferentes no alcance, causando dano igual ao seu Poder Físico-1.',
+            resumo: 'Ataca 2 inimigos diferentes no alcance: dano {F-1}.',
+            visual: { e: 'projetil', f: 'bala', c: '#fde68a', i: 'tiro', disparo: 1 },
             alvo: { tipo: 'varios', alcance: 2, quantidade: 2, quem: 'inimigos' },
             efeitos: [{ tipo: 'dano', valor: { stat: 'fisico', fixo: -1 } }],
         },
@@ -47,6 +51,8 @@ definirEstrela({
             custo: 4,
             descricao:
                 'Billy arremessa uma bomba de fumaça em uma zona no alcance. Todas as zonas adjacentes à zona escolhida são afetadas pelo efeito dessa habilidade. Estrelas dentro dessas zonas têm seu alcance de habilidades reduzido para 1 até o início do próximo turno do jogador.',
+            resumo: 'Fumaça numa zona e arredores: o alcance das habilidades de quem estiver lá vira 1.',
+            visual: { e: 'nuvem', f: 'bomba', c: '#cbd5e1' },
             // Atinge quem está na zona escolhida e nas adjacentes no momento do uso (aliados e o próprio Billy também).
             alvo: { tipo: 'zona', alcance: 3, raioArea: 1, quem: 'todos' },
             efeitos: [
@@ -65,6 +71,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Billy saca sua espingarda e realiza uma Jogada de Ataque contra uma Estrela no alcance, causando dano igual ao seu Poder Físico. Se a armadura atual do alvo for menor que o dano de Sentença, a habilidade ignora a armadura do alvo.',
+            resumo: 'Ataca uma Estrela no alcance: dano {F}; ignora Armadura menor que o dano.',
+            visual: { e: 'projetil', f: 'bala', c: '#fcd34d', i: 'pesado', disparo: 1, chumbo: 1, forte: 1 },
             alvo: { tipo: 'escolha', alcance: 3, quem: 'todos' }, // aliados também podem ser alvo
             // ignoraArmaduraSeMenor: Armadura atual (com a extra) menor que o dano → o dano vai direto para a Vida.
             efeitos: [{ tipo: 'dano', valor: { stat: 'fisico' }, ignoraArmaduraSeMenor: true }],

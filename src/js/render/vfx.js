@@ -2,7 +2,7 @@
 // O motor registra o que aconteceu em state.fx (usos de habilidade, rolagens, dano, movimentos, coleta de Renome).
 // Cada lote novo vira uma sequência com tempo — lançamento → trajeto → impacto — e os números e barras esperam o
 // impacto. Coordenadas "de mundo" em raios de zona (x = 1,5q; y = √3(q/2 + r)): acompanham o arrasto e o tamanho da
-// tela. Estilo de cada habilidade: render/vfx/estilos.js.
+// tela. Estilo de cada habilidade: campo `visual` dela (js/estrelas/).
 // Cada assunto fica num arquivo de render/vfx/; aqui as partes são juntadas num objeto só (VFX.x funciona igual).
 
 import estado from './vfx/estado.js';

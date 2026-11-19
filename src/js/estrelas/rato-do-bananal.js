@@ -23,6 +23,8 @@ definirEstrela({
             tipo: 'passiva',
             descricao:
                 'Sempre que Rato do Bananal causar dano a uma Estrela que recebeu dano dele no turno anterior, ele recupera +1 de Âmago.',
+            resumo: 'Ferir de novo quem ele feriu no turno anterior recupera +1 de Âmago.',
+            visual: { e: 'proprio', c: '#fde047', x: 'aura' },
             gatilho: {
                 evento: 'causouDano',
                 condicao: (c, dono, state) =>
@@ -36,6 +38,8 @@ definirEstrela({
             custo: 4,
             descricao:
                 'Rato do Bananal arremessa uma dinamite contra uma Estrela inimiga no alcance, em um acerto ele causa dano igual ao seu Poder Mágico +1.',
+            resumo: 'Ataca um inimigo no alcance: dano {M+1}.',
+            visual: { e: 'projetil', f: 'dinamite', c: '#fbbf24', i: 'explosao', arco: 1 },
             alvo: { tipo: 'inimigo', alcance: 3 },
             efeitos: [{ tipo: 'dano', valor: { stat: 'magico', fixo: 1 } }],
         },
@@ -45,6 +49,8 @@ definirEstrela({
             custo: 5,
             descricao:
                 'Rato do Bananal arremessa um amontoado de dinamites que caem ao longo de 3 zonas em linha reta a partir dele. Ele realiza uma Jogada de Ataque contra todas as Estrelas na área atingida, causando dano igual ao seu Poder Mágico em um acerto.',
+            resumo: 'Ataca todos em 3 zonas em linha: dano {M}.',
+            visual: { e: 'projetil', f: 'dinamite', c: '#fbbf24', i: 'explosao', arco: 1, multi: 1 },
             alvo: { tipo: 'linha', comprimento: 3 },
             efeitos: [{ tipo: 'dano', valor: { stat: 'magico' } }],
         },
@@ -55,6 +61,8 @@ definirEstrela({
             naoAcumula: true,
             descricao:
                 'Rato do Bananal se envolve em um cinturão de dinamites. Na próxima vez, pela duração, que Rato do Bananal receber dano, uma Estrela adjacente à sua escolha recebe dano igual ao seu Poder Mágico -1.',
+            resumo: 'Na próxima vez que sofrer dano, causa {M-1} de dano a um adjacente.',
+            visual: { e: 'proprio', c: '#f59e0b', x: 'cinto' },
             alvo: { tipo: 'proprio' },
             efeitos: [
                 {
@@ -74,6 +82,7 @@ definirEstrela({
             tipo: 'efeito',
             oculta: true,
             descricao: 'Dano igual ao Poder Mágico -1 em uma Estrela adjacente à sua escolha.',
+            visual: { e: 'direto', c: '#f97316', i: 'explosao' },
             alvo: { tipo: 'escolha', alcance: 1, quem: 'todos' },
             efeitos: [{ tipo: 'dano', valor: { stat: 'magico', fixo: -1 } }],
         },

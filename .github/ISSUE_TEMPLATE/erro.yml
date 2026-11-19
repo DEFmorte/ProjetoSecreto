@@ -1,0 +1,34 @@
+name: Erro no jogo
+description: Algo quebrou, travou ou funcionou diferente do esperado.
+labels: [erro]
+body:
+  - type: textarea
+    id: oque
+    attributes:
+      label: O que aconteceu
+      description: O que você fez, o que esperava e o que aconteceu.
+    validations:
+      required: true
+  - type: textarea
+    id: detalhes
+    attributes:
+      label: Detalhes do erro
+      description: >-
+        Se apareceu a tela "ALGO DEU ERRADO", clique em "Copiar detalhes" e cole aqui (inclui o estado da partida).
+        Se foi no simulador, cole a linha da partida e a semente.
+      render: text
+  - type: input
+    id: versao
+    attributes:
+      label: Versão
+      description: 'Nome do arquivo do jogo (ex.: PlayZinordia_3.4.5.html) ou o commit.'
+  - type: dropdown
+    id: onde
+    attributes:
+      label: Onde
+      options:
+        - Contra o Bot
+        - Online
+        - Menus / seleção
+        - Simulador (npm run simular)
+        - Outro

@@ -1,0 +1,23 @@
+name: Ideia ou balanceamento
+description: Nova Estrela, habilidade, ajuste de números, melhoria da IA ou da interface.
+labels: [ideia]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área
+      options:
+        - Estrelas / balanceamento
+        - Regras do jogo
+        - IA do Bot
+        - Interface
+        - Online
+    validations:
+      required: true
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Proposta
+      description: O que mudar e por quê. Para balanceamento, o resumo do `npm run simular` ajuda muito.
+    validations:
+      required: true

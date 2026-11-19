@@ -23,6 +23,8 @@ definirEstrela({
             tipo: 'passiva',
             descricao:
                 'Sempre que Toppich se mover em linha reta por duas ou mais zonas durante sua jogada, ele recupera +1 de Âmago.',
+            resumo: 'Andar 2 ou mais zonas em linha reta recupera +1 de Âmago.',
+            visual: { e: 'proprio', c: '#bef264', x: 'aura' },
             gatilho: {
                 evento: 'moveu',
                 condicao: (c, dono, state) =>
@@ -39,6 +41,8 @@ definirEstrela({
             custo: 2,
             descricao:
                 'Toppich desfere um golpe pesado com seu martelo contra uma Estrela adjacente, em um acerto ele causa dano igual ao seu Poder Físico.',
+            resumo: 'Ataca uma Estrela adjacente: dano {F}.',
+            visual: { e: 'corpo', f: 'martelo', c: '#bef264', i: 'pesado' },
             alvo: { tipo: 'escolha', alcance: 1, quem: 'todos' }, // aliados também podem ser alvo
             efeitos: [{ tipo: 'dano', valor: { stat: 'fisico' } }],
         },
@@ -48,6 +52,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Toppich arremessa uma Estrela inimiga adjacente sobre sua cabeça, movendo-a para a zona oposta à sua posição atual e causando 1 de dano.',
+            resumo: 'Arremessa um inimigo adjacente para o lado oposto: 1 de dano.',
+            visual: { e: 'corpo', f: 'soco', c: '#bef264', i: 'pesado' },
             alvo: { tipo: 'inimigo', alcance: 1 },
             efeitos: [
                 { tipo: 'deslocar', direcao: 'atravessar' },
@@ -60,6 +66,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Toppich investe contra uma Estrela inimiga adjacente, empurrando-a uma zona em linha reta para trás. Em seguida, Toppich se move para a zona que a Estrela inimiga ocupava. Caso esse movimento faça a Estrela inimiga colidir com o terreno ou com outra Estrela, ela sofre 1 de dano.',
+            resumo: 'Empurra um inimigo adjacente e ocupa o lugar dele; colisão causa 1 de dano.',
+            visual: { e: 'corpo', f: 'soco', c: '#bef264', i: 'pesado' },
             alvo: { tipo: 'inimigo', alcance: 1 },
             efeitos: [
                 {

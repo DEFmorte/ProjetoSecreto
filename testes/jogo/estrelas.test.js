@@ -38,6 +38,10 @@ describe.each(estrelas.map(([cor, e]) => [e.nome, cor, e]))('%s', (nome, cor, e)
         }
     });
 
+    it('toda habilidade da ficha tem resumo de 1 linha (cartões e botões)', () => {
+        for (const id of e.habilidades) expect(CONFIG.abilities[id].resumo, id).toEqual(expect.any(String));
+    });
+
     it('tem retrato', () => {
         expect(RETRATOS[nome]).toBeTruthy();
     });

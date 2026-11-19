@@ -23,6 +23,8 @@ definirEstrela({
             tipo: 'passiva',
             descricao:
                 'Se Garyn não se mover voluntariamente durante sua jogada, ele recebe +1 de Armadura até o início do próximo turno do jogador.',
+            resumo: 'Se não se mover na jogada, ganha +1 de Armadura.',
+            visual: { e: 'proprio', c: '#cbd5e1', x: 'escudo' },
             gatilho: {
                 evento: 'fimAtivacao',
                 condicao: (c, dono) => c.peca.id === dono.id && !dono.turn.moveuVoluntario,
@@ -35,6 +37,8 @@ definirEstrela({
             custo: 2,
             descricao:
                 'Quando uma Estrela inimiga adjacente a Garyn se mover voluntariamente para fora de seus arredores, Garyn pode ativar esta habilidade para realizar uma Jogada de Ataque contra aquela Estrela, causando dano igual ao seu Poder Físico em um acerto.',
+            resumo: 'Ataca ({F} de dano) o inimigo adjacente que tentar se afastar.',
+            visual: { e: 'corpo', f: 'martelo', c: '#fca5a5', i: 'pesado' },
             gatilho: { evento: 'inimigoSaiuDosArredores' },
             efeitoReacao: 'ataque',
             // o alvo já saiu dos arredores ao resolver; o alcance não é revalidado
@@ -47,6 +51,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Garyn avança até 2 zonas em linha reta até uma zona desocupada, causando dano igual ao seu Poder Físico -1 a todos os inimigos no percurso. Se Garyn terminar seu movimento adjacente a duas ou mais Estrelas inimigas, ele ativa Defesa Erguida.',
+            resumo: 'Avança até 2 zonas: dano {F-1} em cada inimigo no caminho.',
+            visual: { e: 'investida', c: '#f87171', i: 'pesado' },
             alvo: { tipo: 'avanco', alcance: 2, quem: 'inimigos' },
             efeitos: [
                 { tipo: 'avancar' },
@@ -64,6 +70,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Garyn gira e realiza uma Jogada de Ataque contra todas as Estrelas inimigas adjacentes, em um acerto ele causa dano igual ao seu Poder Físico.',
+            resumo: 'Ataca todos os inimigos adjacentes: dano {F}.',
+            visual: { e: 'giro', c: '#fca5a5', i: 'corte' },
             alvo: { tipo: 'ao-redor', raio: 1, quem: 'inimigos' },
             efeitos: [{ tipo: 'dano', valor: { stat: 'fisico' } }],
         },

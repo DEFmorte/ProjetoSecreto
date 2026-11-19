@@ -22,6 +22,8 @@ definirEstrela({
             tipo: 'passiva',
             descricao:
                 "Quando Nair'run recebe dano baseado no Poder Mágico de uma Estrela, ele reduz esse dano em 1 (mínimo de 1) e aumenta seu próprio Poder Mágico em 1 até o final do próximo turno do jogador.",
+            resumo: 'Dano mágico recebido −1; ao ser atingido assim, ganha +1 de Mágico.',
+            visual: { e: 'proprio', c: '#6ee7b7', x: 'aura' },
             // reduzDano: redução aplicada ao dano recebido; base: só vale para dano calculado a partir desse status.
             // Os efeitos rodam no próprio Nair'run a cada acionamento.
             reduzDano: { valor: 1, minimo: 1, base: 'magico' },
@@ -33,6 +35,8 @@ definirEstrela({
             custo: 2,
             descricao:
                 "Nair'run desfere um golpe carregado contra uma Estrela adjacente, em um acerto ele causa dano igual ao seu Poder Mágico.",
+            resumo: 'Ataca uma Estrela adjacente: dano {M}.',
+            visual: { e: 'corpo', f: 'soco', c: '#6ee7b7', i: 'energia' },
             alvo: { tipo: 'escolha', alcance: 1, quem: 'todos' }, // aliados também podem ser alvo
             efeitos: [{ tipo: 'dano', valor: { stat: 'magico' } }],
         },
@@ -42,6 +46,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 "Nair'run ativa uma zona de proteção ao seu redor. Todas as Estrelas aliadas adjacentes a ele compartilham metade dos danos recebidos por elas (arredondados para baixo) com Nair'run pela duração.",
+            resumo: 'Aliados adjacentes dividem com ele metade do dano que sofrerem.',
+            visual: { e: 'proprio', c: '#34d399', x: 'cupula' },
             alvo: { tipo: 'proprio' },
             efeitos: [
                 {
@@ -60,6 +66,8 @@ definirEstrela({
             custo: 4,
             descricao:
                 "Nair'run energiza seu reator, criando um fino escudo de energia que o cobre. Escolha um:\n• Converta todo o seu Poder Mágico em Armadura adicional até o início do próximo turno do jogador;\n• Converta toda a sua Armadura em Poder Mágico adicional até o final do próximo turno do jogador.\nO atributo convertido fica zerado pela duração.",
+            resumo: 'Converte o Mágico em Armadura, ou a Armadura em Mágico.',
+            visual: { e: 'proprio', c: '#6ee7b7', x: 'escudo' },
             // modos: o jogador escolhe uma opção (choice = índice); cada efeito com `modo` só roda na opção
             // correspondente. converter: transfere todo o valor atual de um atributo para o outro (não é cópia — a
             // origem fica em 0).

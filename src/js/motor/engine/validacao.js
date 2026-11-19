@@ -14,6 +14,8 @@ export default {
             'nome',
             'tipo',
             'descricao',
+            'resumo',
+            'visual',
             'alvo',
             'efeitos',
             'gatilho',

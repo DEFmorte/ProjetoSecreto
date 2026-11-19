@@ -21,6 +21,8 @@ definirEstrela({
             nome: 'Reflexivo',
             tipo: 'passiva',
             descricao: 'Sempre que Diamante sofrer dano, ele causa 1 de dano a uma Estrela adjacente à sua escolha.',
+            resumo: 'Ao sofrer dano, causa 1 de dano a um adjacente à escolha.',
+            visual: { e: 'projetil', f: 'cristal', c: '#67e8f9', i: 'cristal' },
             gatilho: { evento: 'sofreuDano' },
             alvo: { tipo: 'escolha', alcance: 1, quem: 'todos' },
             efeitos: [{ tipo: 'dano', valor: { fixo: 1 } }],
@@ -31,6 +33,8 @@ definirEstrela({
             custo: 2,
             descricao:
                 'Diamante fortalece o punho e desfere um golpe poderoso contra uma Estrela inimiga adjacente, causando dano igual ao seu Poder Físico em um acerto.',
+            resumo: 'Ataca um inimigo adjacente: dano {F}.',
+            visual: { e: 'corpo', f: 'soco', c: '#67e8f9', i: 'cristal' },
             alvo: { tipo: 'inimigo', alcance: 1 },
             efeitos: [{ tipo: 'dano', valor: { stat: 'fisico' } }],
         },
@@ -40,6 +44,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Diamante soca o chão, fazendo brotar cristais ao seu redor. Causa dano igual ao seu Poder Mágico em todas as Estrelas nos arredores e reduz a Agilidade delas em 1 até o início do próximo turno do jogador.',
+            resumo: 'Dano {M} em todos ao redor e −1 de Agilidade neles.',
+            visual: { e: 'pilares', c: '#67e8f9', i: 'cristal', onda: 1 },
             alvo: { tipo: 'ao-redor', raio: 1, quem: 'todos' },
             efeitos: [
                 { tipo: 'dano', valor: { stat: 'magico' } },
@@ -52,6 +58,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Com um pisão preciso, Diamante cria cristais em 2 zonas em linha reta a partir de sua posição, causando dano igual ao seu Poder Mágico em todas as Estrelas atingidas e reduzindo a Agilidade delas em 1 até o final do próximo turno do jogador.',
+            resumo: 'Dano {M} em 2 zonas em linha e −1 de Agilidade nos atingidos.',
+            visual: { e: 'pilares', c: '#67e8f9', i: 'cristal' },
             alvo: { tipo: 'linha', comprimento: 2 },
             efeitos: [
                 { tipo: 'dano', valor: { stat: 'magico' } },

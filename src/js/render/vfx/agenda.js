@@ -1,7 +1,6 @@
 // ── VFX: agendamento de partículas, tremores e textos ──
 // Parte do VFX (efeitos visuais). Os métodos são juntados em vfx.js; use sempre VFX.nome(...).
 import { Engine } from '../../motor/engine.js';
-import { VFX_ESTILOS } from './estilos.js';
 
 export default {
     // ── agendamento ──
@@ -55,9 +54,10 @@ export default {
         this.item({ tipo: 'texto', id, x: pos.x, y: pos.y, txt, cor, t0, dur, pq, dy: Math.min(n, 3) * 22 });
     },
     estilo(h, cor) {
-        if (VFX_ESTILOS[h]) return VFX_ESTILOS[h];
-        const a = Engine.def(h) || {},
-            alvo = a.alvo || {},
+        const a = Engine.def(h) || {};
+        // Estilo definido na habilidade (campo `visual`, em js/estrelas/); sem ele, um padrão pelo tipo de alvo.
+        if (a.visual) return a.visual;
+        const alvo = a.alvo || {},
             dano = Engine.causaDano(a);
         const e =
             alvo.tipo === 'avanco'

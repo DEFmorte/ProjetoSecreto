@@ -27,6 +27,8 @@ definirEstrela({
             consomeRecurso: 'penitencia',
             descricao:
                 'Sempre que Ângela receber dano, ela recebe um marcador de Penitência. Ela pode acumular até três marcadores de Penitência simultaneamente. Sempre que Ângela acertar uma Jogada de Ataque contra uma Estrela, ela pode consumir qualquer quantidade de marcadores de Penitência para causar +1 de dano para cada marcador consumido.',
+            resumo: 'Ganha Penitência ao sofrer dano (máx. 3). Ao acertar: +1 de dano por marcador gasto.',
+            visual: { e: 'proprio', c: '#fca5a5', x: 'aura' },
             gatilho: { evento: 'sofreuDano' },
             alvo: { tipo: 'proprio' },
             efeitos: [{ tipo: 'recurso', recurso: 'penitencia', valor: 1 }],
@@ -40,6 +42,8 @@ definirEstrela({
             efeitoReacao: 'ataque',
             descricao:
                 'Quando uma Estrela inimiga adjacente falhar em uma Jogada de Ataque contra Ângela, ela pode imediatamente realizar uma Jogada de Ataque contra aquela Estrela, causando dano igual ao seu Poder Físico em um acerto.',
+            resumo: 'Reação: inimigo adjacente errou o ataque nela → contra-ataca: dano {F}.',
+            visual: { e: 'corpo', f: 'estocada', c: '#fde68a', i: 'corte' },
             gatilho: {
                 evento: 'errouAtaqueContra',
                 ainda: (dono, state, t) => {
@@ -56,6 +60,8 @@ definirEstrela({
             custo: 2,
             descricao:
                 'Ângela investe com sua espada contra uma Estrela inimiga adjacente, causando dano igual ao seu Poder Físico em um acerto.',
+            resumo: 'Ataca um inimigo adjacente: dano {F}.',
+            visual: { e: 'corpo', f: 'estocada', c: '#fde68a', i: 'corte' },
             alvo: { tipo: 'inimigo', alcance: 1 },
             efeitos: [{ tipo: 'dano', valor: { stat: 'fisico' } }],
         },
@@ -67,6 +73,8 @@ definirEstrela({
             naoAcumula: true,
             descricao:
                 'Ângela causa 1 de dano a si mesma ao consagrar sua espada. Pela duração, todas as Jogadas de Ataque de Ângela recebem +1 nas rolagens.',
+            resumo: 'Sofre 1 de dano: +1 nas rolagens de ataque por 2 turnos.',
+            visual: { e: 'proprio', c: '#fde68a', x: 'selo' },
             alvo: { tipo: 'proprio' },
             efeitos: [
                 { tipo: 'dano', valor: { fixo: 1 } },

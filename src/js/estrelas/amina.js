@@ -25,6 +25,8 @@ definirEstrela({
             custo: 2,
             descricao:
                 'Quando um aliado no alcance causar dano com uma Jogada de Ataque, Amina pode ativar esta habilidade para conceder +1 de dano para a Jogada de Ataque daquele aliado.',
+            resumo: 'Dá +1 de dano ao ataque de um aliado no alcance.',
+            visual: { e: 'apoio', c: '#e9d5ff', x: 'selo' },
             gatilho: { evento: 'aliadoCausaDanoComAtaque' },
             efeitoReacao: 'bonusDano',
             bonus: 1,
@@ -36,6 +38,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Amina dispara um feixe contra uma Estrela inimiga no alcance, em um acerto ela causa dano igual ao seu Poder Mágico -1 e reduz o Âmago atual do alvo em 1.',
+            resumo: 'Ataca no alcance: dano {M-1} e −1 de Âmago no alvo.',
+            visual: { e: 'feixe', c: '#c084fc', i: 'energia' },
             alvo: { tipo: 'inimigo', alcance: 2 },
             efeitos: [
                 { tipo: 'dano', valor: { stat: 'magico', fixo: -1 } },
@@ -49,6 +53,8 @@ definirEstrela({
             naoAcumula: true,
             descricao:
                 'Pela duração, sempre que um aliado adjacente a Amina usar uma Jogada de Ataque, ele recupera +1 Ponto de Vida.',
+            resumo: 'Aliados adjacentes recuperam +1 de Vida ao atacar.',
+            visual: { e: 'proprio', c: '#d8b4fe', x: 'anel' },
             alvo: { tipo: 'proprio' },
             efeitos: [
                 {
@@ -68,6 +74,7 @@ definirEstrela({
             tipo: 'efeito',
             oculta: true,
             descricao: 'O aliado adjacente que usou a Jogada de Ataque recupera +1 Ponto de Vida.',
+            visual: { e: 'apoio', c: '#86efac', x: 'cura' },
             gatilho: {
                 evento: 'usouAtaque',
                 alvo: 'alvo',
@@ -82,6 +89,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Escolha uma Estrela aliada no alcance. Até o início do próximo turno do jogador, a próxima vez que aquela Estrela causar dano com uma Jogada de Ataque, ela recupera Pontos de Vida iguais ao Poder Mágico de Amina.',
+            resumo: 'O próximo ataque do aliado escolhido que causar dano o cura em {M}.',
+            visual: { e: 'apoio', f: 'feixe', c: '#f5d0fe', x: 'selo' },
             alvo: { tipo: 'escolha', alcance: 2, quem: 'aliados' },
             efeitos: [
                 {
@@ -103,6 +112,7 @@ definirEstrela({
             oculta: true,
             descricao:
                 'O aliado recupera Pontos de Vida iguais ao Poder Mágico de Amina no momento em que a cura ativa.',
+            visual: { e: 'apoio', c: '#86efac', x: 'cura' },
             gatilho: {
                 evento: 'causouDano',
                 alvo: 'dono',

@@ -24,6 +24,8 @@ definirEstrela({
             tipo: 'passiva',
             descricao:
                 'No início do turno do jogador, Cisnela cria uma Marca na Estrela inimiga mais próxima de Shou, essa Marca perdura até o final do turno do jogador. A primeira habilidade de Shou a causar dano em uma Estrela marcada é considerada como tendo a propriedade Ultra Rápida.',
+            resumo: 'Marca o inimigo mais próximo; o 1º dano de Shou nele é Ultra Rápido.',
+            visual: { e: 'projetil', f: 'pena', c: '#f1f5f9', i: 'brilho' },
             // inicioTurno: acionada depois da recuperação de Armadura/Âmago. ultraContraMarca: ver
             // Engine.ultraContraMarca.
             gatilho: { evento: 'inicioTurno' },
@@ -42,6 +44,8 @@ definirEstrela({
             custo: 2,
             descricao:
                 'Shou realiza uma Jogada de Ataque com sua lança contra uma Estrela inimiga adjacente, em um acerto ele causa dano igual ao seu Poder Físico.',
+            resumo: 'Ataca um inimigo adjacente: dano {F}.',
+            visual: { e: 'corpo', f: 'estocada', c: '#e2e8f0', i: 'corte' },
             alvo: { tipo: 'inimigo', alcance: 1 },
             efeitos: [{ tipo: 'dano', valor: { stat: 'fisico' } }],
         },
@@ -52,6 +56,8 @@ definirEstrela({
             ultraRapida: true,
             descricao:
                 'Shou ordena que Cisnela avance em direção a uma Estrela no alcance. Cisnela então transfere a Marca de Graciosa para essa Estrela até o final do turno do jogador.',
+            resumo: 'Passa a Marca de Graciosa para uma Estrela no alcance.',
+            visual: { e: 'projetil', f: 'pena', c: '#f8fafc', i: 'brilho' },
             alvo: {
                 tipo: 'escolha',
                 alcance: 2,
@@ -66,6 +72,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Shou executa um corte em uma área de 2 zonas adjacentes nos seus arredores, causando dano igual ao seu Poder Físico em um acerto.',
+            resumo: 'Ataca uma área de 2 zonas adjacentes: dano {F}.',
+            visual: { e: 'leque', c: '#e2e8f0', i: 'corte' },
             alvo: { tipo: 'arco', zonas: 2, quem: 'inimigos' },
             efeitos: [{ tipo: 'dano', valor: { stat: 'fisico' } }],
         },

@@ -23,6 +23,8 @@ definirEstrela({
             tipo: 'passiva',
             descricao:
                 'As Jogadas de Ataque de Alex marcam os inimigos danificados até o final do próximo turno do jogador, efeitos que removem Debuffs removem as Marcas. Inimigos podem receber mais de uma Marca simultaneamente.',
+            resumo: 'Seus ataques marcam os inimigos feridos (as Marcas acumulam).',
+            visual: { e: 'nada' },
             gatilho: {
                 evento: 'causouDano',
                 alvo: 'alvo',
@@ -41,6 +43,8 @@ definirEstrela({
             custo: 1,
             descricao:
                 'Alex arremessa uma de suas adagas contra o oponente alvo, em um acerto ela causa dano igual ao seu Poder Físico.',
+            resumo: 'Ataca um inimigo no alcance: dano {F}.',
+            visual: { e: 'projetil', f: 'adaga', c: '#fdba74', i: 'corte' },
             alvo: { tipo: 'inimigo', alcance: 2 },
             efeitos: [{ tipo: 'dano', valor: { stat: 'fisico' } }],
         },
@@ -51,6 +55,8 @@ definirEstrela({
             ultraRapida: true,
             descricao:
                 'Alex avança até 2 zonas em linha reta. Se a zona onde ela iria parar estiver ocupada, ela pode escolher terminar seu avanço em uma zona adjacente àquela. Esta habilidade causa dano igual ao seu Poder Mágico e aplica Marca da Precursora a todas as Estrelas inimigas no percurso.',
+            resumo: 'Avança até 2 zonas em linha: dano {M} e Marca em quem estiver no caminho.',
+            visual: { e: 'investida', c: '#fb923c', i: 'corte' },
             alvo: { tipo: 'avanco', alcance: 2, quem: 'inimigos', pousoAdjacente: true },
             efeitos: [
                 { tipo: 'avancar' },
@@ -64,6 +70,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Alex avança até 3 zonas em linha reta até uma zona desocupada, causando 1 de dano e +1 de dano adicional para cada Marca da Precursora que as Estrelas inimigas no percurso possuírem. O custo de Âmago desta habilidade é recuperado se duas ou mais Estrelas atingidas estiverem marcadas.',
+            resumo: 'Avança até 3 zonas: 1 de dano, +1 por Marca de cada inimigo no caminho.',
+            visual: { e: 'investida', c: '#fb923c', i: 'corte' },
             alvo: { tipo: 'avanco', alcance: 3, quem: 'inimigos' },
             efeitos: [
                 { tipo: 'avancar' },

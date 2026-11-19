@@ -1,0 +1,45 @@
+# Roda a cada push e a cada Pull Request: lint, formatação, testes, algumas partidas simuladas e o build.
+# O arquivo do jogo gerado fica disponível para download na página da execução ("Artifacts"), para testar o PR.
+name: Checar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Formatação (Prettier)
+        run: npm run checar-formato
+
+      - name: Testes (Vitest)
+        run: npm test
+
+      - name: Partidas simuladas do Bot
+        run: npm run simular -- --partidas 10 --semente 1
+
+      - name: Build
+        run: npm run build
+
+      - name: Guardar o jogo gerado
+        uses: actions/upload-artifact@v4
+        with:
+          name: jogo
+          path: dist/*.html
+          retention-days: 14

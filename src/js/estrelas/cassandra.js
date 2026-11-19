@@ -26,6 +26,7 @@ definirEstrela({
             imune: ['movimentoInvoluntario'],
             descricao:
                 'Cassandra é imune a efeitos de movimentação involuntária. No entanto, dano e outros Debuffs causados por habilidades com essa característica continuam se aplicando.',
+            resumo: 'Não pode ser empurrada nem puxada.',
         },
         cassandra_punir: {
             nome: 'Proteger e Punir',
@@ -33,6 +34,8 @@ definirEstrela({
             custo: 2,
             descricao:
                 'Cassandra realiza uma Jogada de Ataque contra uma Estrela inimiga adjacente, causando dano igual ao seu Poder Físico e recuperando +1 de Âmago em um acerto.',
+            resumo: 'Ataca um inimigo adjacente: dano {F}; +1 de Âmago se acertar.',
+            visual: { e: 'corpo', f: 'corte', c: '#93c5fd', i: 'corte' },
             alvo: { tipo: 'inimigo', alcance: 1 },
             efeitos: [
                 { tipo: 'dano', valor: { stat: 'fisico' } },
@@ -46,6 +49,8 @@ definirEstrela({
             repetivel: true,
             descricao:
                 'Sempre que uma Estrela inimiga entrar nos arredores de Cassandra, ela pode ativar esta habilidade para reduzir a movimentação restante daquela Estrela para 0.',
+            resumo: 'Inimigo que chegar ao seu lado perde o movimento restante.',
+            visual: { e: 'feixe', c: '#60a5fa', i: 'energia', corrente: 1 },
             gatilho: { evento: 'inimigoEntrouNosArredores' },
             alvo: { tipo: 'inimigo', alcance: 1 },
             efeitos: [{ tipo: 'zerarMovimento' }],
@@ -56,6 +61,8 @@ definirEstrela({
             custo: 4,
             descricao:
                 'Cassandra canaliza sua energia brilhante para aumentar a resistência. Ela ganha +1 de Armadura, até o máximo de +3, para cada Estrela inimiga adjacente, até o início do próximo turno do jogador.',
+            resumo: '+1 de Armadura por inimigo adjacente (máx. +3).',
+            visual: { e: 'proprio', c: '#93c5fd', x: 'escudo' },
             // requer(dono, state): sem inimigo adjacente a habilidade não teria efeito, então fica indisponível.
             alvo: {
                 tipo: 'proprio',

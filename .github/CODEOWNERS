@@ -1,0 +1,39 @@
+# Quem revisa cada parte do código. Num Pull Request, o GitHub pede a revisão automaticamente para os responsáveis
+# pelas pastas que mudaram (e, com a proteção da branch main ligada, o PR só entra com a aprovação deles).
+#
+# Como usar: troque cada `responsavel-...` pelo usuário do GitHub (com @ na frente) ou por um time da organização
+# (@organizacao/time) e tire o # do começo da linha. A última regra que combina com o arquivo é a que vale.
+# Mais em: https://docs.github.com/articles/about-code-owners
+
+# Padrão: tudo que não tiver dono abaixo.
+# *                               responsavel-geral
+
+# Personagens e balanceamento: fichas, habilidades e retratos das Estrelas.
+# /src/js/estrelas/               responsavel-personagens
+# /src/assets/retratos/           responsavel-personagens
+
+# Regras do jogo (motor): tabuleiro, turnos, efeitos, dano, movimento.
+# /src/js/motor/                  responsavel-regras
+
+# IA do Bot e o simulador de partidas.
+# /src/js/bot/                    responsavel-ia
+# /ferramentas/simula*.js         responsavel-ia
+
+# Interface: telas, menus, HUD, desenho e efeitos visuais.
+# /src/index.html                 responsavel-interface
+# /src/css/                       responsavel-interface
+# /src/js/interface/              responsavel-interface
+# /src/js/hud/                    responsavel-interface
+# /src/js/menus/                  responsavel-interface
+# /src/js/render/                 responsavel-interface
+# /src/js/entrada/                responsavel-interface
+
+# Modo online.
+# /src/js/online/                 responsavel-online
+
+# Testes.
+# /testes/                        responsavel-testes
+
+# Configuração do projeto (build, CI, dependências).
+# /package.json                   responsavel-geral
+# /.github/                       responsavel-geral

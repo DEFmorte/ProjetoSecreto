@@ -10,7 +10,7 @@ import { Bot } from '../bot/bot.js';
 import { Rede } from '../online/rede.js';
 import { botsDoModo, jogadoresDoModo, modoAtual } from '../partida/partida.js';
 import { esc } from '../interface/icones.js';
-import { resumoHab, RESUMOS } from '../interface/resumos.js';
+import { resumoHab } from '../interface/resumos.js';
 import { ehCompacto, ehToque } from '../render/tela.js';
 import { tagTipoHTML } from '../hud/cartoes.js';
 
@@ -67,7 +67,7 @@ function infoEstrelaHTML(color) {
         <div class="sel-habs">${Engine.abilitiesOf(p)
             .map(
                 (a) =>
-                    `<div><b class="text-white">${a.nome}</b>${tagTipoHTML(a)}${RESUMOS[a.id] ? `<span class="text-gray-400"> — ${resumoHab(p, a)}</span>` : ''}</div>`,
+                    `<div><b class="text-white">${a.nome}</b>${tagTipoHTML(a)}${a.resumo ? `<span class="text-gray-400"> — ${resumoHab(p, a)}</span>` : ''}</div>`,
             )
             .join('')}</div>`;
 }

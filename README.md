@@ -69,6 +69,7 @@ ferramentas/        plugin do Vite, simulador de partidas
 dist/               saída do build (não vai para o git)
 ```
 
-Detalhes da arquitetura e regras para mexer no código: [CLAUDE.md](CLAUDE.md).
+Como trabalhar no projeto em equipe (por área, fluxo de Pull Requests, testes, publicação):
+[CONTRIBUTING.md](CONTRIBUTING.md). Regras de arquitetura: [CLAUDE.md](CLAUDE.md).
 
 `PlayZinordia_3.4.5.html` na raiz é o arquivo original, antes da organização (guardado só como referência).

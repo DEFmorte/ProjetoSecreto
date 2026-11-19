@@ -30,6 +30,8 @@ definirEstrela({
             repetivel: true,
             descricao:
                 'Ricardinho arremessa uma shuriken em linha reta até uma zona no alcance. Ele realiza uma Jogada de Ataque contra todas as Estrelas no caminho, exceto a da zona alvo, causando dano igual ao seu Poder Físico em um acerto. Ricardinho só pode ativar essa habilidade novamente após recuperar a shuriken. A shuriken permanece na zona alvo até ser recolhida. Ricardinho deve estar na mesma zona que a shuriken ao final da jogada para recuperá-la.',
+            resumo: 'Arremessa a shuriken em linha: ataca quem estiver no caminho, dano {F}.',
+            visual: { e: 'projetil', f: 'shuriken', c: '#cbd5e1', i: 'corte', objeto: 'shuriken' },
             alvo: {
                 tipo: 'trajeto',
                 alcance: 3,
@@ -51,6 +53,8 @@ definirEstrela({
             jogadaDeAtaque: true,
             descricao:
                 'Ricardinho salta sobre uma Estrela inimiga adjacente e aterrissa atrás dela. Durante a acrobacia, Ricardinho realiza uma Jogada de Ataque contra a Estrela inimiga. Em um acerto, Ricardinho causa dano igual ao seu Poder Físico -1.',
+            resumo: 'Salta sobre um inimigo adjacente e o ataca: dano {F-1}.',
+            visual: { e: 'salto', c: '#cbd5e1', i: 'corte' },
             // A zona atrás do alvo (do outro lado dele, em linha reta) precisa existir e estar livre.
             alvo: {
                 tipo: 'inimigo',
@@ -66,6 +70,8 @@ definirEstrela({
             custo: 1,
             descricao:
                 'Quando Ricardinho estiver na mesma zona que sua shuriken, ele pode ativar esta habilidade para arremessá-la novamente. Ricardinho recebe uma nova ativação de Shuriken Grandona.',
+            resumo: 'Na zona da shuriken: recupera e ganha mais um uso de Shuriken Grandona.',
+            visual: { e: 'proprio', c: '#cbd5e1', x: 'aura' },
             // Oferecida quando Ricardinho para na zona da shuriken durante a própria jogada (movimento ou salto).
             // O uso extra não gasta a ação, mas Shuriken Grandona ainda paga o próprio custo.
             gatilho: {
@@ -86,6 +92,8 @@ definirEstrela({
             custo: 4,
             descricao:
                 'Se a shuriken estiver ao alcance, Ricardinho a puxa para sua zona, causando dano igual ao seu Poder Físico a todas as Estrelas no caminho, inclusive a que estiver na zona de onde a shuriken sai. Ricardinho só pode puxar a shuriken em linha reta.',
+            resumo: 'Puxa a shuriken em linha reta: dano {F} no caminho e em quem estiver sobre ela.',
+            visual: { e: 'volta', f: 'shuriken', c: '#cbd5e1', i: 'corte' },
             // destino: a única zona que pode ser escolhida (a da shuriken). Atinge quem está no caminho e na zona dela,
             // sem rolagem.
             alvo: {

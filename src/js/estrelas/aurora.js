@@ -26,6 +26,8 @@ definirEstrela({
             tipo: 'passiva',
             descricao:
                 'Ao final do turno do jogador, Aurora ganha marcadores de Carga do Núcleo equivalentes ao seu valor de Poder Mágico. Aurora pode armazenar até 6 marcadores de Carga do Núcleo ao mesmo tempo.',
+            resumo: 'Fim do turno: ganha Cargas do Núcleo igual ao Poder Mágico (máx. 6).',
+            visual: { e: 'proprio', c: '#5eead4', x: 'aura' },
             gatilho: {
                 evento: 'fimTurno',
                 condicao: (c, dono) =>
@@ -43,6 +45,8 @@ definirEstrela({
             repeteCom: { recurso: 'carga', valor: 1 },
             descricao:
                 'Aurora dispara um feixe de energia contra uma Estrela inimiga no alcance. Em um acerto, Aurora causa 1 de dano ao alvo. Além disso, Aurora pode consumir 1 marcador de Carga do Núcleo para ativar esta habilidade novamente.',
+            resumo: 'Ataca um inimigo no alcance: dano 1. Repete pagando +1 Carga, sem gastar a ação.',
+            visual: { e: 'feixe', c: '#5eead4', i: 'energia' },
             alvo: { tipo: 'inimigo', alcance: 3 },
             efeitos: [{ tipo: 'dano', valor: { fixo: 1 } }],
         },
@@ -54,6 +58,8 @@ definirEstrela({
             ultraRapida: true,
             descricao:
                 'Aurora absorve a energia do núcleo. Ela pode consumir marcadores de Carga do Núcleo para recuperar +1 ponto de Âmago por marcador consumido.',
+            resumo: 'Ultra Rápida: troca Cargas do Núcleo por Âmago (1 por 1).',
+            visual: { e: 'proprio', c: '#99f6e4', x: 'anel' },
             alvo: {
                 tipo: 'proprio',
                 pergunta: 'quantas Cargas do Núcleo consumir?',
@@ -71,6 +77,8 @@ definirEstrela({
             custo: 2,
             descricao:
                 'Aurora concentra um feixe arcano em 2 zonas, em linha reta, a partir dela. Todas as Estrelas na área afetada sofrem 1 de dano. Se esta habilidade causar dano suficiente para reduzir a Armadura de uma Estrela atingida a 0, ela ganha o traço Ultra Rápida.',
+            resumo: 'Linha de 2 zonas: dano 1 em todos. Zerou uma Armadura: vira Ultra Rápida.',
+            visual: { e: 'pilares', c: '#2dd4bf', i: 'energia' },
             alvo: { tipo: 'linha', comprimento: 2, quem: 'todos' },
             efeitos: [{ tipo: 'dano', valor: { fixo: 1 }, ultraSeZerarArmadura: true }],
         },

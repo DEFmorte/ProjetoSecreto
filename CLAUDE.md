@@ -29,7 +29,8 @@ Textos, nomes e comentários do código em português.
   `Rede`, `Bot`...): recebem o estado por parâmetro. Eles rodam também no Worker do Bot (`js/bot/worker.js`) e
   servem para testes. Ponto de entrada da lógica pura: `js/motor/index.js` (já registra as Estrelas).
 - **Estrelas:** um arquivo por Estrela em `js/estrelas/`, chamando `definirEstrela({...})` (formato em
-  `js/estrelas/estrelas.js`). Estrela nova: crie o arquivo e adicione o import em `js/estrelas/index.js`.
+  `js/estrelas/estrelas.js`), com tudo dela, inclusive `resumo` e `visual` de cada habilidade. Estrela nova: crie
+  o arquivo e adicione o import em `js/estrelas/index.js`.
 - **Assets** (`src/assets/`): importe no JS (`import retrato from '../../assets/retratos/x.webp'`) ou use
   `url(../assets/...)` no CSS. No build viram data: URIs.
 - **Tailwind 3** via PostCSS (`tailwind.config.cjs`): as classes precisam aparecer literalmente no HTML/JS (nada de
@@ -76,4 +77,6 @@ Textos, nomes e comentários do código em português.
 
 1. `npm run checar` (lint + formatação + testes). Mudou a IA ou o balanceamento? Rode também `npm run simular`.
 2. `npm run dev`, jogar uma partida contra o Bot e olhar o console (o `Falha` mostra erros na tela).
-3. Antes de distribuir: `npm run build` e testar com `npm run preview` (ou abrir o arquivo de `dist/` direto).
+3. Fluxo da equipe (branches, PRs, CODEOWNERS, publicação): `CONTRIBUTING.md`. O GitHub Actions
+   (`.github/workflows/checar.yml`) roda lint, formatação, testes, 10 partidas simuladas e o build em todo PR.
+4. Antes de distribuir: `npm run build` e testar com `npm run preview` (ou abrir o arquivo de `dist/` direto).

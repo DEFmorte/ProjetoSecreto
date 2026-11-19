@@ -25,6 +25,8 @@ definirEstrela({
             tipo: 'passiva',
             descricao:
                 'Quando Tico está adjacente a uma Estrela aliada, esta não sofre mais que 2 de dano por instância. Ao final de sua jogada, Tico deve designar qual Estrela aliada receberá essa proteção. Apenas uma Estrela pode se beneficiar deste efeito por vez.',
+            resumo: 'Fim da jogada: escolhe 1 aliado; ao lado de Tico, ele sofre no máx. 2 de dano por vez.',
+            visual: { e: 'apoio', c: '#fda4af', x: 'escudo' },
             gatilho: { evento: 'fimAtivacao', condicao: (c, dono) => c.peca.id === dono.id },
             alvo: {
                 tipo: 'escolha',
@@ -52,6 +54,8 @@ definirEstrela({
             custo: 3,
             descricao:
                 'Tico escolhe uma Estrela aliada no alcance e compartilha um pouco de sua energia com ela. Até o início do próximo turno do jogador, a primeira vez que aquela Estrela ativar uma habilidade, o custo de Âmago dessa habilidade é reduzido em -1.',
+            resumo: 'Aliado no alcance: a próxima habilidade dele custa 1 Âmago a menos.',
+            visual: { e: 'apoio', c: '#fb7185', x: 'buff' },
             alvo: { tipo: 'escolha', alcance: 2, quem: 'aliados' },
             efeitos: [
                 {
@@ -73,6 +77,8 @@ definirEstrela({
             efeitoReacao: 'rerolagem',
             descricao:
                 'Quando uma Estrela aliada no alcance estiver realizando uma rolagem de ataque ou esquiva, Tico pode ativar essa habilidade para garantir uma rerolagem nos dados daquela Estrela.',
+            resumo: 'Reação: um aliado no alcance rola de novo o ataque errado ou a esquiva falha.',
+            visual: { e: 'apoio', c: '#fda4af', x: 'mira' },
             gatilho: { evento: 'rolagemAliado' },
             alvo: { tipo: 'escolha', alcance: 2, quem: 'aliados' },
         },
@@ -84,6 +90,8 @@ definirEstrela({
             custo: 2,
             descricao:
                 'Tico pula na direção de uma Estrela inimiga no alcance, aterrissando em uma zona adjacente a ela. Durante o pulo, ele realiza uma Jogada de Ataque contra aquela Estrela, causando dano igual ao seu Poder Físico em um acerto.',
+            resumo: 'Pula para o lado de um inimigo no alcance e ataca: dano {F}.',
+            visual: { e: 'salto', c: '#fb7185', i: 'pesado' },
             alvo: {
                 tipo: 'salto',
                 alcance: 2,
