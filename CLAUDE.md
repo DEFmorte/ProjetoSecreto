@@ -19,9 +19,11 @@ Textos, nomes e comentários do código em português.
 - **A ordem dos `<script>` em `src/index.html` é a ordem de carga** e é a fonte da verdade para o build.
   Arquivo novo → adicione a tag no lugar certo. Código que *roda na carga* (fora de funções) só pode usar o que foi
   declarado em arquivos anteriores; dentro de funções chamadas depois, tanto faz.
-- `js/motor/` (config, regras, engine) e `js/bot/bot.js` também rodam dentro do Worker do Bot (`js/bot/worker.js`):
-  **não podem mexer em DOM/janela na carga**. O Worker tem stubs de `state`, `Rede`, `Tutorial`, `$` e `botsDoModo`.
-  Se o Bot precisar de outro arquivo, adicione-o no `importScripts` do `worker.js` (uma linha só, mesma ordem do index.html).
+- `js/motor/`, `js/estrelas/` e `js/bot/ia.js` são **lógica pura**: também rodam dentro do Worker do Bot
+  (`js/bot/worker.js`), então não podem usar nada da tela (DOM, `state`, `Rede`, `Bot`...). Recebem o estado por parâmetro.
+  Se a IA precisar de outro arquivo, adicione-o no `importScripts` do `worker.js` (uma linha só, mesma ordem do index.html).
+- Estrela nova: arquivo em `js/estrelas/` chamando `definirEstrela({...})` (formato em `js/estrelas/estrelas.js`),
+  listado em `src/index.html` e no `importScripts` do Worker.
 - Assets ficam em `src/assets/`. No JS o caminho é relativo à página (`'assets/retratos/x.webp'`); no CSS, ao
   arquivo `.css` (`url(../assets/fontes/x.woff2)`). O build troca esses caminhos por data: URIs.
 - Classes do Tailwind (v3) precisam aparecer literalmente no HTML/JS (nada de `'p-' + n`), senão não são geradas.
@@ -37,10 +39,10 @@ Textos, nomes e comentários do código em português.
 | Pasta | O que tem |
 |---|---|
 | `nucleo/` | `$` (getElementById) e `Falha` (tela de erro inesperado) |
-| `dados/` | `RETRATOS` das Estrelas |
-| `motor/` | `CONFIG` (Estrelas, habilidades, mapas, modos), `Rules`, `Engine` — regras puras, sem tela |
+| `motor/` | `CONFIG` (mapas, modos, regras gerais), `Rules`, `Engine` — regras puras, sem tela |
+| `estrelas/` | um arquivo por Estrela: ficha, habilidades e retrato (`definirEstrela`, `RETRATOS`) |
 | `partida/` | estado global (`state`, `undoStack`, `teams`), ações/desfazer, salvamento, loop, sorteio da ordem |
-| `bot/` | IA (`Bot`), gerenciador do Worker (`BotWorker`) e o próprio Worker |
+| `bot/` | `IA` (decisão pura, `ia.js`), `Bot` (joga na partida, `bot.js`), `BotWorker` e o Worker |
 | `online/` | `Rede` (PeerJS) e menus online |
 | `interface/` | estado da UI (`ui`), ícones, resumos, glossário, seleção de peça/alvo |
 | `hud/` | barras, registro, cartões e painéis da partida |

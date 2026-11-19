@@ -630,7 +630,7 @@ function montarBotoesCriarSala() {
     const base = Rules.canSelect;
     Rules.canSelect = function (state, piece) {
         return base.call(this, state, piece) && (!Rede.ativo() || Rede.aplicando || piece.player === Rede.eu)
-            && (Bot.aplicando || !Bot.ehBot(piece.player, state)); // contra Bots: as Estrelas deles só agem pelo Bot
+            && (Bot.aplicando || IA.aplicando || !Bot.ehBot(piece.player, state)); // contra Bots: as Estrelas deles só agem pelo Bot
     };
 }
 
