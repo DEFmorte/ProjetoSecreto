@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Teste Z</title>
+    <!-- Segurança: o jogo só pode falar com o servidor de salas do PeerJS (modo online). Imagens, fontes e scripts
+         vêm todos de dentro do projeto; nada externo é carregado. Em desenvolvimento, os arquivos vêm do próprio
+         servidor ('self'); no build (arquivo único) a política volta a ser só 'unsafe-inline' e data:. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://0.peerjs.com wss://0.peerjs.com; base-uri 'none'; form-action 'none'">
+    <meta name="referrer" content="no-referrer">
+    <!-- Impressão digital do código (o modo online só junta jogadores com a mesma). Preenchida pelo servidor e pelo build. -->
+    <meta name="versao-jogo" content="">
+    <link rel="stylesheet" href="css/fontes.css">
+    <link rel="stylesheet" href="css/estilo.css">
+    <link rel="stylesheet" href="css/tailwind.css">
+</head>
+<body>
+
+    <!-- CELULAR EM PÉ: pede para girar (ver #girar-tela no CSS) -->
+    <div id="girar-tela">
+        <svg viewBox="0 0 64 64" fill="none" stroke="#60a5fa" stroke-width="3" aria-hidden="true"><rect x="20" y="6" width="24" height="52" rx="4"/><line x1="29" y1="51" x2="35" y2="51"/></svg>
+        <p class="girar-titulo">GIRE O CELULAR</p>
+        <p class="girar-texto">TESTE Z é jogado na horizontal. Deite o aparelho para continuar.</p>
+        <button id="btn-girar" class="hidden menu-btn primario">Jogar na horizontal</button>
+        <p class="girar-nota">Se a tela não girar, desative o bloqueio de rotação do aparelho.</p>
+    </div>
+
+    <!-- INTERFACE DO JOGO -->
+    <!-- INTERFACE DO JOGO
+         Layout (telas largas): coluna esquerda = Estrela selecionada + registro; coluna direita = ordem dos turnos,
+         inspeção e botões; base central = aviso OU habilidades (nunca os dois). O tabuleiro é centralizado no espaço
+         livre entre elas (ver resizeCanvas / HUD_RESERVA). -->
+    <div id="ui-layer" class="absolute inset-0 z-10 pointer-events-none">
+
+        <div id="turn-banner" class="hidden pointer-events-auto absolute top-0 left-1/2 -translate-x-1/2 text-white px-6 py-2.5 rounded-b-2xl shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-b-2 border-x-2 transition-colors duration-300" style="background-color:#1f2937;border-color:#4b5563;">
+            <h2 id="turn-text" class="text-lg md:text-xl font-bold tracking-widest uppercase text-center">TURNO</h2>
+            <p id="turn-hint" class="text-[11px] font-semibold tracking-wide text-center opacity-80 mt-0.5"></p>
+            <p id="online-pill" class="online-status hidden text-[10px] font-bold tracking-widest uppercase text-center text-cyan-300 mt-0.5"></p>
+        </div>
+
+        <div id="hud-esq" class="hud-col esq">
+            <div id="stats-panel" class="hidden glass-panel rounded-xl p-4 min-h-0 overflow-y-auto rolagem-fina text-white shadow-2xl border-l-4">
+            <div class="flex items-center gap-3 mb-4 border-b border-gray-600 pb-3">
+                <div id="stats-color-dot" class="w-5 h-5 rounded-full shadow-[0_0_10px_currentColor]"></div>
+                <h3 id="stats-name" class="font-bold text-sm tracking-widest uppercase">NOME</h3>
+            </div>
+            <div id="stats-list" class="space-y-2 text-xs mono font-bold"></div>
+            </div>
+            <div id="log-panel" class="hidden mt-auto shrink-0 glass-panel rounded-xl text-[11px] text-gray-300 shadow-2xl">
+            <button id="log-toggle" class="w-full flex justify-between items-center px-3 py-2 text-[10px] font-bold tracking-widest text-gray-400 hover:text-white">REGISTRO DE COMBATE <span id="log-toggle-icon">▾</span></button>
+            <div id="log-list" class="max-h-[30vh] overflow-y-auto px-3 pb-2"></div>
+            </div>
+        </div>
+
+        <!-- Inspeção: ao lado do painel da Estrela selecionada (ou no lugar dele, se não houver seleção) -->
+        <div id="inspect-panel" class="hidden glass-panel rounded-xl p-4 overflow-y-auto rolagem-fina text-white shadow-2xl border-l-4">
+        <p id="inspect-title" class="text-[10px] font-bold tracking-widest text-gray-400 mb-2">INSPECIONANDO</p>
+        <div class="flex items-center gap-3 mb-4 border-b border-gray-600 pb-3">
+            <div id="inspect-color-dot" class="w-5 h-5 rounded-full"></div>
+            <h3 id="inspect-name" class="font-bold text-sm tracking-widest uppercase">NOME</h3>
+        </div>
+        <div id="inspect-list" class="space-y-2 text-xs mono font-bold"></div>
+        </div>
+        <div id="hud-dir" class="hud-col dir">
+            <div id="initiative-bar" class="hidden shrink-0 glass-panel rounded-xl p-3 text-white shadow-2xl">
+            <p id="initiative-title" class="text-[10px] font-bold tracking-widest text-gray-400 mb-2">ORDEM DOS TURNOS</p>
+            <div id="initiative-list" class="flex flex-col gap-1"></div>
+            <p id="ini-extra" class="hidden"></p>
+            <p id="initiative-legenda">Número = Agilidade · ▶ agindo · ✓ já agiu</p>
+            </div>
+            <div id="action-bar" class="hidden mt-auto shrink-0 flex flex-wrap gap-2">
+            <button id="btn-skip" class="basis-full glass-panel text-white text-xs font-bold tracking-widest uppercase flex-1 whitespace-nowrap px-3 py-2.5 rounded-xl hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition">Encerrar<span class="so-largo"> jogada</span> <span class="kbd ml-1">E</span></button>
+            <button id="btn-undo" class="glass-panel text-white text-xs font-bold tracking-widest uppercase flex-1 whitespace-nowrap px-3 py-2.5 rounded-xl hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition">Desfazer <span class="kbd ml-1">Ctrl+Z</span></button>
+            <button id="btn-menu" class="glass-panel text-white text-xs font-bold tracking-widest uppercase flex-1 whitespace-nowrap px-3 py-2.5 rounded-xl hover:bg-gray-700 transition">Menu <span class="kbd ml-1">Esc</span></button>
+            </div>
+        </div>
+
+        <div id="hud-base">
+            <div id="prompt-bar" class="hidden pointer-events-auto glass-panel rounded-xl px-5 py-3 text-white text-sm font-bold shadow-2xl text-center">
+                <span id="prompt-text"></span>
+                <div id="prompt-buttons" class="flex flex-wrap justify-center gap-2 mt-2"></div>
+            </div>
+            <div id="ability-bar" class="hidden pointer-events-auto flex flex-wrap justify-center gap-2"></div>
+        </div>
+        <div id="ability-tip" class="hidden pointer-events-none z-30 absolute left-1/2 -translate-x-1/2 glass-panel rounded-xl px-4 py-3 text-white text-xs shadow-2xl w-[22rem] max-w-[90vw]"></div>
+        <!-- Partida guiada: caixa do passo atual -->
+        <div id="tutorial" class="hidden glass-panel pointer-events-auto">
+            <div class="tut-topo"><span id="tut-passo"></span><span><button id="tut-min" title="Encolher o guia para ver o tabuleiro">Encolher</button><button id="tut-fechar" title="Fechar o guia (a partida continua)">Fechar guia ×</button></span></div>
+            <h3 id="tut-titulo"></h3>
+            <p id="tut-texto"></p>
+            <p id="tut-nota" class="hidden"></p>
+            <div class="tut-rodape"><span id="tut-espera">Faça isso no jogo para continuar…</span><button id="tut-proximo" class="hidden"></button></div>
+        </div>
+    </div>
+
+    <!-- PAUSA / FIM DE PARTIDA -->
+    <div id="pause-screen" class="hidden fixed inset-0 z-40 items-center justify-center bg-gray-950/70 backdrop-blur-sm p-4">
+        <div class="bg-gray-900 border border-gray-700 rounded-3xl shadow-2xl p-8 w-full max-w-sm flex flex-col text-center">
+            <h2 id="pause-title" class="text-2xl font-black text-white tracking-wide">PAUSA</h2>
+            <p id="pause-sub" class="text-gray-400 text-sm mt-1 mb-6"></p>
+            <div id="pause-buttons" class="flex flex-col gap-3"></div>
+        </div>
+    </div>
+
+    <!-- COMO JOGAR -->
+    <div id="help-screen" class="hidden fixed inset-0 z-[60] overflow-y-auto p-4 bg-gray-950/80 backdrop-blur-sm" style="touch-action: pan-y;">
+        <div class="m-auto max-w-3xl w-full bg-gray-900 border border-gray-700 rounded-3xl shadow-2xl p-6 md:p-8 text-gray-300 flex flex-col gap-5">
+            <div class="flex items-center gap-3">
+                <button id="btn-help-back" class="text-gray-400 hover:text-white text-xs font-bold tracking-widest uppercase px-3 py-2 rounded-lg hover:bg-gray-800 transition shrink-0">← Voltar <span class="kbd ml-1">Esc</span></button>
+                <h2 class="text-xl md:text-2xl font-black text-white tracking-wide flex-1 text-center">COMO JOGAR</h2>
+                <span class="w-24 shrink-0 hidden md:block"></span>
+            </div>
+            <div id="tutorial-box" class="tutorial-convite"><div><b>Primeira vez?</b> Jogue uma partida guiada, passo a passo.</div><button id="btn-tutorial" class="menu-btn primario">Partida guiada</button></div>
+            <div id="help-tabs" class="flex flex-wrap gap-2 justify-center"></div>
+            <div id="help-content" class="ajuda text-sm leading-relaxed"></div>
+            <p id="ajuda-rodape" class="text-center text-[11px] text-gray-500">← → troca de aba · Esc volta</p>
+        </div>
+    </div>
+
+    <!-- MENUS -->
+    <div id="menu-screen" class="absolute inset-0 z-50 flex overflow-y-auto p-4 glass-panel" style="touch-action: pan-y;">
+        <div id="main-menu" class="m-auto text-center transition-all duration-300">
+            <h1 class="text-5xl md:text-7xl font-black text-white mb-2 tracking-tighter">TESTE<span class="text-blue-500"> Z</span></h1>
+            <p class="text-gray-400 mb-10 tracking-widest text-sm md:text-base">BATALHA ESTRATÉGICA EM GRID</p>
+            <div class="flex flex-col gap-3 min-w-[18rem] mx-auto">
+                <button id="btn-continuar" class="hidden pointer-events-auto menu-btn continuar"><span class="text-left"><span class="block">Continuar partida</span><span id="continuar-info" class="block text-[10px] font-semibold normal-case tracking-normal text-gray-400"></span></span><span class="kbd">C</span></button>
+                <button id="btn-play" class="pointer-events-auto menu-btn primario text-lg">Jogar contra Bots <span class="kbd">Enter</span></button>
+                <button id="btn-online" class="pointer-events-auto menu-btn">Jogar online <span class="kbd">O</span></button>
+                <button id="btn-help" class="pointer-events-auto menu-btn">Como jogar <span class="kbd">H</span></button>
+                <button id="btn-tela-cheia" class="hidden pointer-events-auto menu-btn">Tela cheia</button>
+            </div>
+        </div>
+
+        <div id="modo-menu" class="hidden flex-col gap-4 max-w-sm w-full bg-gray-900 border border-gray-700 p-6 md:p-7 rounded-3xl shadow-2xl m-auto text-white">
+            <h2 class="text-2xl font-black text-white uppercase text-center tracking-wide">Contra Bots</h2>
+            <p class="text-xs text-gray-400 text-center leading-relaxed">Você contra o computador, neste aparelho. A ordem dos turnos é sorteada no início.</p>
+            <div id="modo-opcoes" class="flex flex-col gap-3"></div>
+            <button id="btn-modo-voltar" class="pointer-events-auto menu-btn">← Menu <span class="kbd">Esc</span></button>
+        </div>
+
+        <div id="online-menu" class="hidden flex-col gap-4 max-w-sm w-full bg-gray-900 border border-gray-700 p-6 md:p-7 rounded-3xl shadow-2xl m-auto text-white">
+            <h2 class="text-2xl font-black text-cyan-300 uppercase text-center tracking-wide">Jogar online</h2>
+            <div id="online-entrada" class="flex flex-col gap-4">
+                <p class="text-xs text-gray-400 text-center leading-relaxed">Um jogador cria a sala (para 2 ou 3 jogadores) e envia o código (ou o link) aos outros. Quem cria joga como <b class="text-blue-300">Jogador 1</b>.</p>
+                <div id="criar-sala-botoes" class="flex flex-col gap-3"></div>
+                <div class="flex items-center gap-2 text-gray-500 text-[11px] tracking-widest uppercase"><span class="flex-1 border-t border-gray-700"></span>ou entre numa sala<span class="flex-1 border-t border-gray-700"></span></div>
+                <div class="flex gap-2">
+                    <input id="input-codigo" maxlength="6" autocomplete="off" spellcheck="false" placeholder="CÓDIGO" class="pointer-events-auto min-w-0 flex-1 rounded-xl bg-gray-800 border-2 border-gray-600 focus:border-cyan-400 outline-none px-4 py-2 text-center text-xl font-black tracking-[0.3em] uppercase">
+                    <button id="btn-entrar-sala" class="pointer-events-auto menu-btn">Entrar</button>
+                </div>
+            </div>
+            <div id="sala-box" class="hidden flex-col items-center gap-2 rounded-2xl border border-cyan-700 bg-gray-800/60 p-4">
+                <span class="text-[11px] text-gray-400 tracking-widest uppercase">Código da sala</span>
+                <span id="sala-codigo" class="text-4xl font-black tracking-[0.3em] text-cyan-300 select-all"></span>
+                <button id="btn-copiar-link" class="pointer-events-auto menu-btn text-xs w-full">Copiar link de convite</button>
+            </div>
+            <ul id="sala-jogadores" class="hidden flex-col gap-1.5"></ul>
+            <p id="online-status" class="online-status min-h-[1.25rem] text-center text-sm font-bold text-cyan-200"></p>
+            <button id="btn-online-back" class="pointer-events-auto menu-btn text-sm">← Menu <span class="kbd">Esc</span></button>
+        </div>
+
+        <div id="selection-menu" class="hidden flex-col items-center max-w-lg w-full bg-gray-900 border border-gray-700 p-6 md:p-7 rounded-3xl shadow-2xl transition-all duration-300 m-auto">
+            <h2 id="selection-title" class="text-2xl md:text-3xl font-black text-blue-400 mb-4 uppercase text-center tracking-wide"></h2>
+            <p id="selection-online" class="online-status hidden -mt-2 mb-3 text-center text-xs font-bold tracking-widest uppercase text-cyan-300"></p>
+            <div class="flex gap-4 mb-5 h-20" id="selected-slots"></div>
+            <p id="selection-hint" class="text-gray-400 text-sm mb-4 font-bold tracking-widest"></p>
+            <div class="flex flex-wrap justify-center gap-4 mb-5" id="color-options"></div>
+            <div id="selection-info" class="w-full min-h-[5.5rem] mb-4 rounded-2xl border border-gray-700 bg-gray-800/50 px-4 py-3 text-xs text-gray-300"></div>
+            <div class="flex gap-3 w-full">
+                <button id="btn-sel-back" class="pointer-events-auto text-gray-300 hover:text-white font-bold py-3 px-4 rounded-2xl border-2 border-gray-600 hover:border-gray-400 bg-gray-800/60 transition text-sm tracking-widest uppercase shrink-0">← Menu</button>
+                <button id="btn-sel-sortear" class="pointer-events-auto" title="Escolhe 3 Estrelas ao acaso (tecla S)">🎲 Sortear <span class="kbd ml-1">S</span></button>
+                <button id="btn-confirm-team" disabled class="pointer-events-auto flex-1 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 disabled:border-gray-600 disabled:shadow-none disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-2xl transition-all text-lg border-2 border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.5)]">
+                    CONFIRMAR <span class="kbd ml-1">Enter</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Scripts: a ORDEM importa (scripts clássicos dividem o mesmo escopo global; ver CLAUDE.md). -->
+    <script src="js/nucleo/falha.js"></script>
+    <script src="js/dados/retratos.js"></script>
+    <script src="js/nucleo/dom.js"></script>
+    <script src="js/motor/config.js"></script>
+    <script src="js/motor/regras.js"></script>
+    <script src="js/motor/engine.js"></script>
+    <script src="js/partida/estado.js"></script>
+    <script src="js/menus/tutorial.js"></script>
+    <script src="js/bot/bot.js"></script>
+    <script src="js/bot/bot-worker.js"></script>
+    <script src="js/online/rede.js"></script>
+    <script src="js/partida/partida.js"></script>
+    <script src="js/partida/salvamento.js"></script>
+    <script src="js/partida/acoes.js"></script>
+    <script src="js/interface/ui.js"></script>
+    <script src="js/interface/icones.js"></script>
+    <script src="js/interface/resumos.js"></script>
+    <script src="js/interface/glossario.js"></script>
+    <script src="js/interface/selecao.js"></script>
+    <script src="js/menus/escolha-equipe.js"></script>
+    <script src="js/menus/menu-principal.js"></script>
+    <script src="js/render/canvas.js"></script>
+    <script src="js/render/tela.js"></script>
+    <script src="js/render/hex.js"></script>
+    <script src="js/hud/hud.js"></script>
+    <script src="js/hud/cartoes.js"></script>
+    <script src="js/partida/loop.js"></script>
+    <script src="js/partida/sorteio.js"></script>
+    <script src="js/entrada/ponteiro.js"></script>
+    <script src="js/render/desenho.js"></script>
+    <script src="js/render/vfx.js"></script>
+    <script src="js/render/cena.js"></script>
+    <script src="js/menus/pausa.js"></script>
+    <script src="js/menus/ajuda.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/vendor/peerjs.min.js"></script>
+</body>
+</html>

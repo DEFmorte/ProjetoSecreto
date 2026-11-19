@@ -1,0 +1,21 @@
+// Retratos placeholder das Estrelas (por nome; WebP 112×112 em assets/retratos/). Estrela sem retrato usa só a cor.
+const RETRATOS = {
+    'Diamante': 'assets/retratos/diamante.webp',
+    'Lorena': 'assets/retratos/lorena.webp',
+    'Alex': 'assets/retratos/alex.webp',
+    'Toppich': 'assets/retratos/toppich.webp',
+    'Rato do Bananal': 'assets/retratos/rato-do-bananal.webp',
+    'Garyn': 'assets/retratos/garyn.webp',
+    'Amina': 'assets/retratos/amina.webp',
+    'Vitória': 'assets/retratos/vitoria.webp',
+    'Nair\'run': 'assets/retratos/nairrun.webp',
+    'Siff': 'assets/retratos/siff.webp',
+    'Shou & Cisnela': 'assets/retratos/shou-e-cisnela.webp',
+    'Icnoyotl': 'assets/retratos/icnoyotl.webp',
+    'Cassandra': 'assets/retratos/cassandra.webp',
+    'Tico': 'assets/retratos/tico.webp',
+    'Aurora': 'assets/retratos/aurora.webp',
+    'Billy': 'assets/retratos/billy.webp',
+    'Ricardinho': 'assets/retratos/ricardinho.webp',
+    'Ângela': 'assets/retratos/angela.webp',
+};

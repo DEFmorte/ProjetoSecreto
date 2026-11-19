@@ -1,0 +1,9 @@
+node_modules/
+dist/
+
+# Arquivo original de antes da organização (o build gera o equivalente em dist/)
+/PlayZinordia_*.html
+
+.DS_Store
+Thumbs.db
+*.log
