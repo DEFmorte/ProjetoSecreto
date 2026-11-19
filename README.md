@@ -53,6 +53,25 @@ Cria `dist/PlayZinordia_<versão>.html`: um arquivo só, com tudo embutido, que 
 ou hospedar em qualquer lugar). A versão vem do campo `version` do `package.json`. Para conferir: `npm run preview`
 e abra `http://localhost:8090/PlayZinordia_<versão>.html`.
 
+## Versão para computador (.exe)
+
+```powershell
+npm run exe
+```
+
+Cria em `release/`:
+
+- `TesteZ-Instalador-<versão>.exe`: instalador (atalho no menu Iniciar e na área de trabalho, desinstala pelo Windows);
+- `TesteZ-Portatil-<versão>.exe`: abre direto, sem instalar (bom para mandar para alguém testar).
+
+É o mesmo jogo, numa janela própria (F11 = tela cheia). Para conferir o executável sem abrir na mão:
+`npm run exe:testar` (joga uma partida sozinho e diz se deu tudo certo). Para só abrir a janela durante o
+desenvolvimento: `npm run app`.
+
+Como o executável não tem assinatura digital (um certificado pago), na primeira vez o Windows mostra "O Windows
+protegeu o computador": é só clicar em "Mais informações" → "Executar assim mesmo". O ícone ainda é o padrão do
+Electron: para trocar, coloque um `build/icon.png` (512×512) e gere de novo.
+
 ## Onde fica cada coisa
 
 ```
@@ -65,8 +84,10 @@ src/
     motor/          regras do jogo (sem tela)
     bot/            IA do Bot
 testes/             testes automáticos (npm test)
-ferramentas/        plugin do Vite, simulador de partidas
+electron/           janela da versão para computador (.exe)
+ferramentas/        plugin do Vite, simulador de partidas, teste do .exe
 dist/               saída do build (não vai para o git)
+release/            saída do npm run exe (não vai para o git)
 ```
 
 Como trabalhar no projeto em equipe (por área, fluxo de Pull Requests, testes, publicação):

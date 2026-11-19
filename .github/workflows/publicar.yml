@@ -17,6 +17,10 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+# O Electron (versão para computador) não é usado aqui: não precisa baixar.
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: 1
+
 jobs:
   publicar:
     runs-on: ubuntu-latest

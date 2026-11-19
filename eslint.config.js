@@ -27,11 +27,11 @@ export default [
     },
     {
         // Ferramentas e configurações (Node)
-        files: ['*.js', '*.cjs', 'ferramentas/**/*.js', 'testes/**/*.js'],
+        files: ['*.js', '*.cjs', 'ferramentas/**/*.js', 'testes/**/*.js', 'electron/**/*.cjs'],
         languageOptions: { globals: { ...globals.node } },
     },
     {
-        files: ['*.cjs'],
+        files: ['*.cjs', 'electron/**/*.cjs'],
         languageOptions: { sourceType: 'commonjs' },
     },
 ];

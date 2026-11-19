@@ -4,6 +4,7 @@
   "private": true,
   "description": "Teste Z / PlayZinordia — jogo de tabuleiro hexagonal no navegador.",
   "type": "module",
+  "main": "electron/main.cjs",
   "engines": {
     "node": ">=22.15"
   },
@@ -18,20 +19,52 @@
     "lint": "eslint .",
     "formatar": "prettier --write .",
     "checar-formato": "prettier --check .",
-    "checar": "npm run lint && npm run checar-formato && npm test"
+    "checar": "npm run lint && npm run checar-formato && npm test",
+    "app": "npm run build && electron .",
+    "exe": "npm run build && electron-builder --win",
+    "exe:testar": "node ferramentas/testar-exe.js"
   },
-  "dependencies": {
-    "peerjs": "1.5.4"
+  "build": {
+    "appId": "jogo.testez",
+    "productName": "Teste Z",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**",
+      "dist/*.html",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "TesteZ-Instalador-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "TesteZ-Portatil-${version}.${ext}"
+    }
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "electron": "45.2.3",
+    "electron-builder": "26.18.1",
     "eslint": "10.14.0",
     "globals": "17.14.0",
+    "peerjs": "1.5.4",
     "postcss": "8.5.33",
     "prettier": "3.9.10",
     "tailwindcss": "3.4.19",
     "vite": "8.3.5",
     "vite-plugin-singlefile": "2.3.4",
     "vitest": "5.1.0"
+  },
+  "allowScripts": {
+    "electron-winstaller": false
   }
 }

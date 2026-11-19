@@ -7,6 +7,10 @@ on:
     branches: [main]
   pull_request:
 
+# O Electron (versão para computador) não é usado aqui: não precisa baixar.
+env:
+  ELECTRON_SKIP_BINARY_DOWNLOAD: 1
+
 jobs:
   checar:
     runs-on: ubuntu-latest

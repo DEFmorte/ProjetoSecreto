@@ -13,7 +13,10 @@ Textos, nomes e comentários do código em português.
   tempo da IA, ações inválidas, partidas travadas e habilidades que a IA nunca usa. `--semente N` repete as mesmas
   partidas (a semente de uma partida com problema aparece no resultado).
 - `npm run lint` (ESLint) e `npm run formatar` (Prettier). `npm run checar` = lint + formatação + testes.
-- A versão fica em `package.json` (`version`) e dá nome ao arquivo do build.
+- `npm run exe` — versão para computador (Electron, `electron/main.cjs`): instalador e portátil em `release/`. Abre o
+  arquivo único de `dist/`, então o jogo é o mesmo. `npm run exe:testar` abre o .exe escondido e joga uma partida
+  sozinho (`TESTEZ_AUTOTESTE=1`). `npm run app` abre a janela sem empacotar.
+- A versão fica em `package.json` (`version`) e dá nome ao arquivo do build e do .exe.
 
 ## Arquitetura
 

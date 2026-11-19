@@ -110,3 +110,6 @@ Achou um erro? Escreva um teste que mostra o erro, corrija, e o teste garante qu
   ```
 
   (Na primeira vez, ative em Settings → Pages → Source: GitHub Actions.)
+
+- Versão para computador: `npm run exe` (instalador e portátil em `release/`), depois `npm run exe:testar`. Os
+  arquivos de `release/` não vão para o git: para distribuir, anexe-os a um Release no GitHub.
