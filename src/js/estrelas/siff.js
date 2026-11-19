@@ -1,8 +1,13 @@
 // ── Siff ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import retratoSiff from '../../assets/retratos/siff.webp';
+
 definirEstrela({
     cor: '#f0abfc',
-    retrato: 'assets/retratos/siff.webp',
+    retrato: retratoSiff,
     ficha: {
         nome: 'Siff', vida: 11, amago: 9, armadura: 0, agilidade: 4, fisico: 0, magico: 2,
         habilidades: ['siff_aura', 'siff_vento', 'siff_correcao', 'siff_poder']

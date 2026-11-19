@@ -1,4 +1,7 @@
-const CONFIG = {
+import { Rules } from './regras.js';
+import { Engine } from './engine.js';
+
+export const CONFIG = {
     // Tabuleiro hexagonal (hexágonos "deitados"). O formato vem do mapa do modo de jogo (CONFIG.mapas).
     // hexRadius: tamanho máximo do hexágono em px (diminui para caber na tela) até hexRadiusMin;
     // abaixo disso o mapa não encolhe mais e passa a ser arrastado (deslizar a tela).

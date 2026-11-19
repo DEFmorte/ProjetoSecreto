@@ -1,3 +1,16 @@
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import { state } from '../partida/estado.js';
+import { ui } from '../interface/ui.js';
+import { COR, iconePronto, IMG_ICONES } from '../interface/icones.js';
+import { selectedPiece } from '../interface/selecao.js';
+import { boardLayer, canvas, ctx, definirBoardLayer, renderCache, view } from './canvas.js';
+import { hexToPixel } from './hex.js';
+import { alcanceHexes } from '../hud/hud.js';
+import { corVida } from '../hud/cartoes.js';
+import { VFX } from './vfx.js';
+
 function drawStar(x, y, rOut, rIn, fill, stroke) {
     ctx.beginPath();
     for (let i = 0; i < 10; i++) {
@@ -10,7 +23,7 @@ function drawStar(x, y, rOut, rIn, fill, stroke) {
 }
 
 // Shuriken no tabuleiro: 4 pontas girando devagar, centro na cor da Estrela dona.
-function drawShuriken(x, y, r, timestamp, corDono) {
+export function drawShuriken(x, y, r, timestamp, corDono) {
     const ang = timestamp / 900;
     ctx.save();
     ctx.translate(x, y);
@@ -32,7 +45,7 @@ function drawShuriken(x, y, r, timestamp, corDono) {
 }
 
 // Marcador de Renome no tabuleiro (fica por baixo das Estrelas; visível quando a zona está livre).
-function drawRenomeMarker(m, R, timestamp) {
+export function drawRenomeMarker(m, R, timestamp) {
     const { x, y } = hexToPixel(m.q, m.r);
     const glow = 0.5 + 0.5 * Math.sin(timestamp / 400);
     ctx.save();
@@ -50,19 +63,19 @@ function drawRenomeMarker(m, R, timestamp) {
 }
 
 // Ícone redondo com contorno escuro (selos nas Estrelas).
-function drawIcone(id, x, y, raio, contorno = '#111827') {
+export function drawIcone(id, x, y, raio, contorno = '#111827') {
     ctx.drawImage(IMG_ICONES[id], x - raio, y - raio, raio * 2, raio * 2);
     drawCircle(x, y, raio, null, contorno, 1.5);
 }
 
 // Bolinha com número (quantidade/valor por cima de um ícone).
-function drawContagem(x, y, n, raio = 6.5) {
+export function drawContagem(x, y, n, raio = 6.5) {
     drawCircle(x, y, raio, '#111827', CONFIG.renome.cor, 1.25);
     drawLabel(String(n), x, y + 0.5, `bold ${raio > 7 ? 10 : 9}px Inter`, '#ffffff');
 }
 
 // Selo de Renome (carregado pela Estrela, ou marcador sob uma Estrela).
-function drawRenomeBadge(x, y, n, rOut = 12, rIn = 5.5, stroke = '#713f12') {
+export function drawRenomeBadge(x, y, n, rOut = 12, rIn = 5.5, stroke = '#713f12') {
     if (iconePronto(CONFIG.renome.icone)) {
         drawIcone(CONFIG.renome.icone, x, y, rOut - 1, stroke === '#ffffff' ? '#ffffff' : '#111827');
         drawContagem(x + rOut * 0.75, y + rOut * 0.75, n, 6);
@@ -74,7 +87,7 @@ function drawRenomeBadge(x, y, n, rOut = 12, rIn = 5.5, stroke = '#713f12') {
 
 // Texto centralizado.
 // Contador de recurso especial (ex.: Penas Energizadas) à esquerda da Estrela.
-function drawRecursoBadge(x, y, n, cfg = {}) {
+export function drawRecursoBadge(x, y, n, cfg = {}) {
     ctx.beginPath();
     ctx.ellipse(x, y, 6.5, 9, -0.5, 0, Math.PI * 2); // pena estilizada
     ctx.fillStyle = n > 0 ? (cfg.cor || '#fcd34d') : '#1f2937';
@@ -85,19 +98,19 @@ function drawRecursoBadge(x, y, n, cfg = {}) {
     drawLabel(String(n), x, y + 0.5, 'bold 10px Inter', n > 0 ? '#422006' : '#9ca3af');
 }
 
-function drawLabel(txt, x, y, font, color) {
+export function drawLabel(txt, x, y, font, color) {
     ctx.fillStyle = color; ctx.font = font; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(txt, x, y);
 }
 
-function drawCircle(x, y, rad, fill, stroke, lineWidth) {
+export function drawCircle(x, y, rad, fill, stroke, lineWidth) {
     ctx.beginPath();
     ctx.arc(x, y, rad, 0, 2 * Math.PI);
     if (fill) { ctx.fillStyle = fill; ctx.fill(); }
     if (stroke) { ctx.lineWidth = lineWidth; ctx.strokeStyle = stroke; ctx.stroke(); }
 }
 
-function drawHexagon(x, y, radius, fill, stroke, lineWidth = 1, c = ctx) {
+export function drawHexagon(x, y, radius, fill, stroke, lineWidth = 1, c = ctx) {
     c.beginPath();
     for (let i = 0; i < 6; i++) {
         const a = (Math.PI / 3) * i;
@@ -110,10 +123,10 @@ function drawHexagon(x, y, radius, fill, stroke, lineWidth = 1, c = ctx) {
     if (stroke) { c.lineWidth = lineWidth; c.strokeStyle = stroke; c.stroke(); }
 }
 
-function getBoardLayer() {
+export function getBoardLayer() {
     if (boardLayer) return boardLayer;
     const R = view.hexR, vis = CONFIG.board.visual;
-    boardLayer = document.createElement('canvas');
+    definirBoardLayer(document.createElement('canvas'));
     boardLayer.width = canvas.width;
     boardLayer.height = canvas.height;
     const c = boardLayer.getContext('2d');
@@ -134,7 +147,7 @@ function habilidadeEmFoco() {
     return piece && a ? { piece, a } : null;
 }
 
-function refreshRenderCache() {
+export function refreshRenderCache() {
     renderCache.pendingIds = new Set(state && !state.winner ? Rules.pendingIds(state) : []);
     renderCache.blockIndexById.clear();
     if (state && CONFIG.rules.turnMode === 'initiative') {
@@ -167,7 +180,7 @@ function refreshRenderCache() {
 
 // Posição desenhada da Estrela (desliza da zona anterior até a atual depois de um movimento).
 // Com efeitos visuais: anda pelo caminho (andar, investida, salto, empurrão) e soma os desvios (bote, recuo, esquiva).
-function posPeca(p, t) {
+export function posPeca(p, t) {
     const pos = posCaminho(p, t), d = VFX.desvio(p.id, t);
     if (d) { pos.x += d.x; pos.y += d.y; }
     return pos;
@@ -183,7 +196,7 @@ function posCaminho(p, t) {
     return { x: ini.x + (fim.x - ini.x) * e, y: ini.y + (fim.y - ini.y) * e };
 }
 
-function caminhoArredondado(x, y, w, h, r) {
+export function caminhoArredondado(x, y, w, h, r) {
     ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
 }
@@ -204,7 +217,7 @@ function drawBarra(x, y, w, h, frac, cor) {
 }
 
 // Texto com contorno escuro (legível sobre qualquer fundo).
-function drawTextoContorno(txt, x, y, font, cor, contorno = 'rgba(0, 0, 0, 0.9)', largura = 3) {
+export function drawTextoContorno(txt, x, y, font, cor, contorno = 'rgba(0, 0, 0, 0.9)', largura = 3) {
     ctx.font = font; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.lineJoin = 'round'; ctx.lineWidth = largura; ctx.strokeStyle = contorno;
     ctx.strokeText(txt, x, y);
@@ -254,7 +267,7 @@ function drawPilula(x, y, txt, fundo, h) {
     drawLabel(txt, x, y + 0.5, font, '#0b1220');
 }
 // t: com efeitos visuais, mostra os valores de antes até o golpe chegar e a "barra fantasma" do dano.
-function drawContadores(p, x, y, R, efeitos, t = 0) {
+export function drawContadores(p, x, y, R, efeitos, t = 0) {
     const s = p.stats, w = R * 1.0, x0 = x - w / 2;
     const hv = Math.max(10, Math.round(R * 0.23)), ha = Math.max(3, Math.round(R * 0.09));
     const y0 = y + R * 0.5;

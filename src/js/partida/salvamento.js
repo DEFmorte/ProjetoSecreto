@@ -1,13 +1,23 @@
 // ── Salvamento automático (só partidas locais) ──
 // A cada mudança, guarda a partida (com as últimas jogadas para desfazer) no navegador. Ao abrir o jogo de novo,
 // o menu oferece "Continuar partida". A partida terminada (ou online) não fica salva.
+import { $ } from '../nucleo/dom.js';
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { definirModoEscolhido, definirTeams, equipesVazias, state, teams, undoStack } from './estado.js';
+import { Tutorial } from '../menus/tutorial.js';
+import { Bot } from '../bot/bot.js';
+import { Rede } from '../online/rede.js';
+import { botsDoModo, modosLocais, snapshot } from './partida.js';
+import { gameRunning, startGame } from './loop.js';
+
 const SALVAR = { chave: 'testez_partida', versao: 1, desfazer: 10, espera: 300 };
 let salvarTimer = null;
-function agendarSalvamento() {
+export function agendarSalvamento() {
     clearTimeout(salvarTimer);
     salvarTimer = setTimeout(salvarPartida, SALVAR.espera);
 }
-function salvarPartida() {
+export function salvarPartida() {
     clearTimeout(salvarTimer); salvarTimer = null;
     if (!gameRunning || !state || Rede.ativo() || Tutorial.partida) return; // a partida guiada não é salva
     try {
@@ -47,18 +57,22 @@ function tempoDesde(ms) {
     const d = Math.round(h / 24);
     return `há ${d} dia${d > 1 ? 's' : ''}`;
 }
-function atualizarBotaoContinuar() {
+export function atualizarBotaoContinuar() {
     const save = lerPartidaSalva();
     $('btn-continuar').classList.toggle('hidden', !save);
     if (save) $('continuar-info').textContent = `${botsDoModo(save.modo).length ? `${CONFIG.modos[save.modo].nome} (${Bot.nivel({ botNivel: save.botNivel }).nome}) · ` : ''}Rodada ${save.rodada} · salva ${tempoDesde(save.salvoEm)}`;
 }
-function continuarPartida() {
+export function continuarPartida() {
     const save = lerPartidaSalva();
     if (!save) { atualizarBotaoContinuar(); return; }
-    teams = equipesVazias();
+    definirTeams(equipesVazias());
     for (const [j, cores] of Object.entries(save.equipes)) if (Array.isArray(cores)) teams[j] = [...cores];
     const s = JSON.parse(save.estado);
-    modoEscolhido = CONFIG.modos[s.modo] ? s.modo : CONFIG.modoLocalPadrao;
+    definirModoEscolhido(CONFIG.modos[s.modo] ? s.modo : CONFIG.modoLocalPadrao);
     startGame(save.estado, save.desfazer);
 }
+
+// Executado uma vez na inicialização do jogo (main.js), na ordem certa em relação aos outros módulos.
+export function iniciarSalvamento() {
 window.addEventListener('pagehide', salvarPartida);
+}

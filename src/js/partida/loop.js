@@ -1,17 +1,23 @@
-let gameRunning = false;
-let loopHandle = null;
+import { $ } from '../nucleo/dom.js';
+import { beginMatch } from './sorteio.js';
+import { gameLoop } from '../render/cena.js';
 
-function stopLoop() {
+export let gameRunning = false;
+export function definirGameRunning(valor) { gameRunning = valor; return valor; } // para outros módulos trocarem "gameRunning"
+export let loopHandle = null;
+export function definirLoopHandle(valor) { loopHandle = valor; return valor; } // para outros módulos trocarem "loopHandle"
+
+export function stopLoop() {
     if (loopHandle) cancelAnimationFrame(loopHandle);
     loopHandle = null;
 }
 
-function startLoop() {
+export function startLoop() {
     stopLoop();
     loopHandle = requestAnimationFrame(gameLoop);
 }
 
-function startGame(estadoJson = null, desfazer = null) {
+export function startGame(estadoJson = null, desfazer = null) {
     const menu = $('menu-screen');
     menu.classList.add('hidden-menu');
     setTimeout(() => {

@@ -1,8 +1,11 @@
 // ── Tico ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import retratoTico from '../../assets/retratos/tico.webp';
+
 definirEstrela({
     cor: '#9f1239',
-    retrato: 'assets/retratos/tico.webp',
+    retrato: retratoTico,
     ficha: {
         nome: 'Tico', vida: 9, amago: 16, armadura: 0, agilidade: 3, fisico: 2, magico: 0,
         habilidades: ['tico_chegada', 'tico_folga', 'tico_desse', 'tico_pulguento']

@@ -1,3 +1,20 @@
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import { definirState, definirUndoStack, state, undoStack } from './estado.js';
+import { Bot } from '../bot/bot.js';
+import { Rede } from '../online/rede.js';
+import { snapshot } from './partida.js';
+import { agendarSalvamento } from './salvamento.js';
+import { ui } from '../interface/ui.js';
+import { COR } from '../interface/icones.js';
+import { clearSelection, selectedPiece, selectPiece } from '../interface/selecao.js';
+import { aplicarMapa } from '../render/tela.js';
+import { refreshHUD, updateActionBar } from '../hud/hud.js';
+import { gameRunning } from './loop.js';
+import { VFX } from '../render/vfx.js';
+import { abrirPausa, pausaAberta } from '../menus/pausa.js';
+
 function pushUndo() {
     if (Rede.ativo()) return; // online não há desfazer
     undoStack.push(snapshot());
@@ -21,7 +38,7 @@ function finishChange() {
 
 // Ações da partida: a interface monta uma ação e chama executar(). No modo local ela é aplicada direto;
 // online, o convidado envia a ação ao anfitrião, que confere de quem é a vez, aplica e devolve o estado.
-function executar(acao, jogador = Rede.eu) {
+export function executar(acao, jogador = Rede.eu) {
     if (!Rede.ativo() && Bot.ativo()) {
         // Contra o Bot: você só age com as suas Estrelas e decide as suas reações/escolhas.
         const voce = state.jogadores.find(j => !Bot.ehBot(j));
@@ -43,7 +60,7 @@ function executar(acao, jogador = Rede.eu) {
     return ok;
 }
 
-function aplicarAcao(a) {
+export function aplicarAcao(a) {
     switch (a && a.tipo) {
         case 'mover': return aplicarMover(a.pieceId, a.path);
         case 'habilidade': return aplicarHabilidade(a.pieceId, a.abilityId, a.choice, a.pagamento);
@@ -91,17 +108,17 @@ function aplicarEncerrar(pieceId) {
     return finishChange();
 }
 
-function commitMove(pieceId, path) { return executar({ tipo: 'mover', pieceId, path }); }
+export function commitMove(pieceId, path) { return executar({ tipo: 'mover', pieceId, path }); }
 
-function useAbility(abilityId, choice, pagamento = (ui.mode && ui.mode.abilityId === abilityId ? ui.mode.pagamento : null)) {
+export function useAbility(abilityId, choice, pagamento = (ui.mode && ui.mode.abilityId === abilityId ? ui.mode.pagamento : null)) {
     const piece = selectedPiece();
     if (!piece) return false;
     return executar({ tipo: 'habilidade', pieceId: piece.id, abilityId, choice: choice === undefined ? null : choice, pagamento });
 }
 
-const resolveChoice = targetId => executar({ tipo: 'escolha', targetId });
-const resolveRoll = hit => executar({ tipo: 'rolagem', hit: !!hit });
-const resolveReaction = use => executar({ tipo: 'reacao', usar: !!use });
+export const resolveChoice = targetId => executar({ tipo: 'escolha', targetId });
+export const resolveRoll = hit => executar({ tipo: 'rolagem', hit: !!hit });
+export const resolveReaction = use => executar({ tipo: 'reacao', usar: !!use });
 
 // Estrela que coleta/encerra: a ativa, senão a selecionada.
 function pecaDaVez() {
@@ -109,12 +126,12 @@ function pecaDaVez() {
     return Rules.activePiece(state) || selectedPiece();
 }
 
-function collectRenome() {
+export function collectRenome() {
     const piece = pecaDaVez();
     return piece ? executar({ tipo: 'coletar', pieceId: piece.id }) : false;
 }
 
-function endActivation() {
+export function endActivation() {
     const piece = pecaDaVez();
     return piece ? executar({ tipo: 'encerrar', pieceId: piece.id }) : false;
 }
@@ -127,25 +144,25 @@ function acaoTeste(pieceId, fn) {
     fn(piece);
     finishChange();
 }
-const dealDamage = (pieceId, amount) => acaoTeste(pieceId, p => { Engine.dealDamage(state, null, p, amount, 'teste'); Engine.resolveQueue(state); });
-const cleansePiece = pieceId => acaoTeste(pieceId, p => Engine.removeDebuffs(state, p, 'teste'));
-const healPiece = (pieceId, amount) => acaoTeste(pieceId, p => Rules.heal(p, amount));
+export const dealDamage = (pieceId, amount) => acaoTeste(pieceId, p => { Engine.dealDamage(state, null, p, amount, 'teste'); Engine.resolveQueue(state); });
+export const cleansePiece = pieceId => acaoTeste(pieceId, p => Engine.removeDebuffs(state, p, 'teste'));
+export const healPiece = (pieceId, amount) => acaoTeste(pieceId, p => Rules.heal(p, amount));
 
-function undo() {
+export function undo() {
     if (undoStack.length === 0 || !gameRunning || Rede.ativo()) return;
     const antes = { state, pilha: [...undoStack] };
-    state = JSON.parse(undoStack.pop());
+    definirState(JSON.parse(undoStack.pop()));
     // Contra Bots: volta até a sua última decisão (desfaz também o que os Bots fizeram depois dela).
-    while (Bot.ativo() && undoStack.length && (Bot.vez() || state.winner)) state = JSON.parse(undoStack.pop());
+    while (Bot.ativo() && undoStack.length && (Bot.vez() || state.winner)) definirState(JSON.parse(undoStack.pop()));
     // Nenhuma decisão sua para voltar (ex.: um Bot começou a partida): não desfaz nada.
-    if (Bot.ativo() && (Bot.vez() || state.winner)) { state = antes.state; undoStack = antes.pilha; return; }
+    if (Bot.ativo() && (Bot.vez() || state.winner)) { definirState(antes.state); definirUndoStack(antes.pilha); return; }
     Bot.parar();
     aplicarMapa(state.mapa || 'classico');
     ui.vis = null; // desfazer não mostra números flutuantes
     afterStateChange();
 }
 
-function afterStateChange() {
+export function afterStateChange() {
     let target = null;
     if (state && !state.winner) {
         const active = Rules.activePiece(state);

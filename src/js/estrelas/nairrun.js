@@ -1,8 +1,11 @@
 // ── Nair'run ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import retratoNairrun from '../../assets/retratos/nairrun.webp';
+
 definirEstrela({
     cor: '#10b981',
-    retrato: 'assets/retratos/nairrun.webp',
+    retrato: retratoNairrun,
     ficha: {
         nome: 'Nair\'run', vida: 12, amago: 11, armadura: 2, agilidade: 2, fisico: 0, magico: 1,
         habilidades: ['nairrun_reator', 'nairrun_pancada', 'nairrun_projecao', 'nairrun_sobrecarga']

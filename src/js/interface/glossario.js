@@ -1,7 +1,11 @@
 // ── Glossário ──
 // Fonte única: a aba Glossário mostra todos os termos por seção; os que têm `re` ficam coloridos nas descrições
 // (com a explicação ao passar o mouse). nota: true = termo menos comum, explicado também no rodapé do cartão da habilidade.
-const GLOSSARIO = (() => {
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { esc, iconeHTML } from './icones.js';
+
+export const GLOSSARIO = (() => {
     const atk = CONFIG.rules.attackRoll, dado = d => `${d.count}D${d.sides}`, ren = CONFIG.renome;
     const stat = k => CONFIG.statFields.find(f => f.key === k);
     const sec = CONFIG.habilidades.secundarias, mk = CONFIG.marks;
@@ -46,18 +50,18 @@ const GLOSSARIO = (() => {
             desc: `${r.desc} Guarda até ${r.max}. Aparece na ficha e ao lado da Estrela no tabuleiro.` }))
     ];
 })();
-const GLOSSARIO_SECOES = {
+export const GLOSSARIO_SECOES = {
     'Fluxo de jogo': 'A partida flui através da sucessão de Rodadas, Turnos e Jogadas. Essa hierarquia organiza o uso de recursos, a ativação de habilidades e a movimentação no tabuleiro, permitindo que cada jogador execute sua estratégia de forma ordenada. Para fins de simplificação e coesão entre todos os modos de jogo, os turnos são mais referenciados do que as rodadas.',
     'Causando e recebendo dano': 'Todo dano é resolvido por meio de <b>instâncias de dano</b>. Uma instância representa uma aplicação individual de dano, independentemente do valor causado. Sempre que uma habilidade, efeito ou reação causar dano, cria-se uma nova instância que é resolvida separadamente das demais. Ao receber uma instância de dano, a Estrela reduz primeiro sua <i>Armadura</i>; apenas o dano excedente afeta seus <i>Pontos de Vida</i>. Caso uma habilidade cause dano múltiplas vezes, cada aplicação é considerada uma instância distinta e deve ser resolvida individualmente. Isso é importante para efeitos e habilidades que utilizam gatilhos como <b>“ao causar dano”</b>, <b>“ao receber dano”</b> ou <b>“sempre que sofrer dano”</b>, pois esses gatilhos verificam cada instância separadamente. Por exemplo, uma habilidade que causa 2 de dano três vezes gera três instâncias de dano, podendo ativar efeitos relacionados ao dano três vezes, em vez de apenas uma.'
 };
 // Ordem das seções na aba Glossário.
-const GLOSSARIO_ORDEM = ['Atributos', 'Fluxo de jogo', 'Tabuleiro', 'Habilidades', 'Causando e recebendo dano', 'Efeitos'];
+export const GLOSSARIO_ORDEM = ['Atributos', 'Fluxo de jogo', 'Tabuleiro', 'Habilidades', 'Causando e recebendo dano', 'Efeitos'];
 const semTags = t => String(t).replace(/<[^>]+>/g, '');
 const GLOSSARIO_RE = new RegExp(`(?<!\\p{L})(${GLOSSARIO.filter(g => g.re).flatMap(g => g.re.split('|')).sort((a, b) => b.length - a.length).join('|')})(?!\\p{L})`, 'gu');
 const termoDoGlossario = (txt) => GLOSSARIO.find(g => g.re && new RegExp(`^(?:${g.re})$`, 'u').test(txt));
 
 // Descrição escapada com os termos coloridos. comTitulo: explicação ao passar o mouse.
-function descricaoComTermos(texto, comTitulo = true) {
+export function descricaoComTermos(texto, comTitulo = true) {
     return esc(texto || '').replace(GLOSSARIO_RE, m => {
         const g = termoDoGlossario(m);
         return g ? `<span class="termo-gl${comTitulo ? ' com-dica' : ''}" style="color:${g.cor}"${comTitulo ? ` title="${esc(g.nome + ': ' + semTags(g.desc))}"` : ''}>${m}</span>` : m;
@@ -65,7 +69,7 @@ function descricaoComTermos(texto, comTitulo = true) {
 }
 
 // Rodapé do cartão da habilidade: explicação curta dos termos menos comuns usados na descrição.
-function notasDeTermos(texto) {
+export function notasDeTermos(texto) {
     const vistos = [];
     for (const m of String(texto || '').matchAll(GLOSSARIO_RE)) {
         const g = termoDoGlossario(m[0]);

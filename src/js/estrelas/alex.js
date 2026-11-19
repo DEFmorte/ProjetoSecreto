@@ -1,8 +1,12 @@
 // ── Alex ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Rules } from '../motor/regras.js';
+import retratoAlex from '../../assets/retratos/alex.webp';
+
 definirEstrela({
     cor: '#f97316',
-    retrato: 'assets/retratos/alex.webp',
+    retrato: retratoAlex,
     ficha: {
         nome: 'Alex', vida: 8, amago: 12, armadura: 0, agilidade: 3, fisico: 1, magico: 2,
         habilidades: ['alex_marca', 'alex_adaga', 'alex_mergulhar', 'alex_avante']

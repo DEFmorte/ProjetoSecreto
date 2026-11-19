@@ -1,8 +1,11 @@
 // ── Diamante ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import retratoDiamante from '../../assets/retratos/diamante.webp';
+
 definirEstrela({
     cor: '#06b6d4',
-    retrato: 'assets/retratos/diamante.webp',
+    retrato: retratoDiamante,
     ficha: {
         nome: 'Diamante', vida: 10, amago: 8, armadura: 2, agilidade: 2, fisico: 1, magico: 1,
         habilidades: ['diamante_reflexo', 'diamante_punho', 'diamante_soco_chao', 'diamante_pisao']

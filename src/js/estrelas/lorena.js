@@ -1,8 +1,12 @@
 // ── Lorena ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Rules } from '../motor/regras.js';
+import retratoLorena from '../../assets/retratos/lorena.webp';
+
 definirEstrela({
     cor: '#ec4899',
-    retrato: 'assets/retratos/lorena.webp',
+    retrato: retratoLorena,
     ficha: {
         nome: 'Lorena', vida: 10, amago: 10, armadura: 0, agilidade: 4, fisico: 2, magico: 0,
         habilidades: ['lorena_flecha', 'lorena_preciso', 'lorena_cadeia', 'lorena_ignora_esquiva']

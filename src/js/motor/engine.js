@@ -1,4 +1,7 @@
-const Engine = {
+import { CONFIG } from './config.js';
+import { Rules } from './regras.js';
+
+export const Engine = {
     rng: Math.random,
 
     def(id) { return CONFIG.abilities[id] || null; },

@@ -1,4 +1,4 @@
-const ui = {
+export const ui = {
     selectedId: null,
     hoverId: null,   // Estrela sob o cursor (inspeção temporária)
     pinId: null,     // Estrela fixada para inspeção (clique em Estrela que não pode ser selecionada)

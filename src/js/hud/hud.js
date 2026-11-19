@@ -1,3 +1,22 @@
+import { $ } from '../nucleo/dom.js';
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import { state, undoStack } from '../partida/estado.js';
+import { Tutorial } from '../menus/tutorial.js';
+import { Bot } from '../bot/bot.js';
+import { Rede } from '../online/rede.js';
+import { collectRenome, resolveChoice, resolveReaction, resolveRoll, useAbility } from '../partida/acoes.js';
+import { ui } from '../interface/ui.js';
+import { COR, esc, icRenome } from '../interface/icones.js';
+import { resumoHab } from '../interface/resumos.js';
+import { descricaoComTermos, notasDeTermos } from '../interface/glossario.js';
+import { cancelAbilityMode, custoHTML, selectedPiece, selectPiece, startAbilityMode, trocarPagamento } from '../interface/selecao.js';
+import { retratoSrc } from '../menus/escolha-equipe.js';
+import { ehCompacto, ehToque, HUD } from '../render/tela.js';
+import { inspectedPiece, setHover, tagTipoHTML, updateInspectPanel } from './cartoes.js';
+import { refreshRenderCache } from '../render/desenho.js';
+
 function tipoLabel(a, piece) {
     const c = Engine.caracteristicas(piece, a);
     return ((CONFIG.habilidades.primarias[a.tipo] || {}).label || a.tipo) + (c.ultraRapida ? ' · Ultra Rápida' : '');
@@ -71,24 +90,8 @@ function updateInitiativeBar() {
     }).join('');
 }
 
-// Passar o mouse / clicar num nome da ordem dos turnos inspeciona a Estrela.
-(() => {
-    const list = $('initiative-list');
-    const idDe = (e) => { const row = e.target.closest('[data-id]'); return row ? Number(row.dataset.id) : null; };
-    list.addEventListener('mouseover', e => setHover(idDe(e), true));
-    list.addEventListener('mouseleave', () => setHover(null));
-    list.addEventListener('click', e => {
-        const id = idDe(e);
-        if (id == null) return;
-        const p = Rules.pieceById(state, id);
-        if (p && Rules.canSelect(state, p)) { selectPiece(p); return; }
-        ui.pinId = ui.pinId === id ? null : id;
-        updateInspectPanel();
-    });
-})();
-
 // Por que a habilidade não pode ser usada agora (texto curto para o botão/dica).
-function motivoIndisponivel(piece, a) {
+export function motivoIndisponivel(piece, a) {
     const car = Engine.caracteristicas(piece, a);
     if (!Engine.modosPagamento(piece, a, car).length) return a.custoAlternativo ? 'Sem Âmago nem Penas' : 'Sem Âmago';
     if (!Engine.podeUsarNaRodada(piece, a, car)) return 'Já usada neste turno';
@@ -180,7 +183,7 @@ function agoraHab(p, a) {
 }
 
 // Habilidade sob o mouse: alcance + alvos no tabuleiro e um cartão com a descrição completa, perto do botão.
-function setPreview(id, forcar = false) {
+export function setPreview(id, forcar = false) {
     const tip = $('ability-tip');
     if (ui.previewId !== id || forcar) { ui.previewId = id; refreshRenderCache(); }
     document.querySelectorAll('#ability-bar [data-ability]').forEach(b => b.classList.toggle('em-foco', b.dataset.ability === id));
@@ -231,7 +234,7 @@ function setPreview(id, forcar = false) {
 }
 
 // Zonas dentro do alcance (andando só por zonas existentes) — para mostrar antes de escolher o alvo.
-function alcanceHexes(piece, a) {
+export function alcanceHexes(piece, a) {
     const alvo = Engine.alvoDe(piece, a);
     if (alvo.tipo === 'proprio') return [{ q: piece.q, r: piece.r }];
     if (alvo.tipo === 'linha' || alvo.tipo === 'avanco' || alvo.tipo === 'trajeto') {
@@ -376,11 +379,9 @@ function desenharLog() {
     }).join('');
     if (list._html !== html) { list.innerHTML = html; list._html = html; list.scrollTop = list.scrollHeight; }
 }
-$('log-toggle').addEventListener('click', () => { ui.logAberto = !ui.logAberto; desenharLog(); });
-$('ability-bar').addEventListener('pointerdown', (e) => { ui.toqueHab = e.pointerType !== 'mouse'; }, true);
-$('ability-tip').addEventListener('click', () => setPreview(null)); // compacto: tocar no cartão fecha
+ // compacto: tocar no cartão fecha
 
-function updateActionBar() {
+export function updateActionBar() {
     $('btn-undo').disabled = undoStack.length === 0;
     const p = state && !state.winner ? (Rules.activePiece(state) || selectedPiece()) : null;
     $('btn-skip').disabled = !(p && Rules.canSelect(state, p));
@@ -405,7 +406,7 @@ function dicaTurno() {
     return partes.join(' · ');
 }
 
-function refreshHUD() {
+export function refreshHUD() {
     refreshRenderCache();
     updateTurnBannerUI();
     updateInitiativeBar();
@@ -416,7 +417,7 @@ function refreshHUD() {
 }
 
 // Situação de cada habilidade na rodada (para planejar: reação pronta, habilidade já usada, sem Âmago).
-function situacaoHabilidade(piece, a) {
+export function situacaoHabilidade(piece, a) {
     const usada = ((piece.turn && piece.turn.usos) || {})[a.id] > 0 && !Engine.podeUsarNaRodada(piece, a);
     if (a.tipo === 'passiva') return { txt: 'PASSIVA', cls: 'text-gray-400' };
     if (usada) return { txt: 'USADA', cls: 'text-gray-500' };
@@ -426,4 +427,26 @@ function situacaoHabilidade(piece, a) {
     if (alt) return { txt: `◆${custo}${alt}`, cls: 'text-sky-400' };
     if (a.tipo === 'reacao') return { txt: `◆${custo} · REAÇÃO`, cls: 'text-green-400' };
     return { txt: `◆${custo}`, cls: 'text-sky-400' };
+}
+
+// Executado uma vez na inicialização do jogo (main.js), na ordem certa em relação aos outros módulos.
+export function iniciarHud() {
+// Passar o mouse / clicar num nome da ordem dos turnos inspeciona a Estrela.
+(() => {
+    const list = $('initiative-list');
+    const idDe = (e) => { const row = e.target.closest('[data-id]'); return row ? Number(row.dataset.id) : null; };
+    list.addEventListener('mouseover', e => setHover(idDe(e), true));
+    list.addEventListener('mouseleave', () => setHover(null));
+    list.addEventListener('click', e => {
+        const id = idDe(e);
+        if (id == null) return;
+        const p = Rules.pieceById(state, id);
+        if (p && Rules.canSelect(state, p)) { selectPiece(p); return; }
+        ui.pinId = ui.pinId === id ? null : id;
+        updateInspectPanel();
+    });
+})();
+$('log-toggle').addEventListener('click', () => { ui.logAberto = !ui.logAberto; desenharLog(); });
+$('ability-bar').addEventListener('pointerdown', (e) => { ui.toqueHab = e.pointerType !== 'mouse'; }, true);
+$('ability-tip').addEventListener('click', () => setPreview(null));
 }

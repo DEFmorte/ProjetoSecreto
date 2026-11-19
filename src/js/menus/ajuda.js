@@ -1,4 +1,16 @@
 // ── Como jogar (abas) ──
+import { $ } from '../nucleo/dom.js';
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import { Rede } from '../online/rede.js';
+import { ui } from '../interface/ui.js';
+import { COR, esc, iconeHTML, ICONES, icRenome } from '../interface/icones.js';
+import { descricaoComTermos, GLOSSARIO, GLOSSARIO_ORDEM, GLOSSARIO_SECOES } from '../interface/glossario.js';
+import { chipsStatus, estrelaExemplo, estrelasEmOrdem, retratoSrc } from './escolha-equipe.js';
+import { setPreview } from '../hud/hud.js';
+import { abrirPausa, fecharPausa } from './pausa.js';
+
 let ajudaVolta = null; // null = menu principal, 'pausa' = volta ao menu de pausa, 'jogo' = volta à partida
 const ABAS_AJUDA = [
     { id: 'objetivo', nome: 'Objetivo' },
@@ -9,7 +21,7 @@ const ABAS_AJUDA = [
     { id: 'controles', nome: 'Controles' }
 ];
 
-function mostrarAjuda(aba = ui.abaAjuda, volta = null) {
+export function mostrarAjuda(aba = ui.abaAjuda, volta = null) {
     ajudaVolta = volta;
     if (volta === 'pausa') fecharPausa();
     setPreview(null);
@@ -22,7 +34,7 @@ function mostrarAjuda(aba = ui.abaAjuda, volta = null) {
     tela.scrollTop = 0;
 }
 
-function fecharAjuda(voltar = true) {
+export function fecharAjuda(voltar = true) {
     const tela = $('help-screen');
     const aberta = !tela.classList.contains('hidden');
     tela.classList.add('hidden');
@@ -31,7 +43,7 @@ function fecharAjuda(voltar = true) {
     ajudaVolta = null;
 }
 
-function trocarAbaAjuda(passo) {
+export function trocarAbaAjuda(passo) {
     const i = ABAS_AJUDA.findIndex(t => t.id === ui.abaAjuda);
     ui.abaAjuda = ABAS_AJUDA[(i + passo + ABAS_AJUDA.length) % ABAS_AJUDA.length].id;
     renderAjuda();

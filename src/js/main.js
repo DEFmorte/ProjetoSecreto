@@ -1,3 +1,56 @@
+// ── Início do jogo ──
+// Ponto de entrada (src/index.html carrega só este arquivo). Os outros módulos só declaram coisas; o que precisa
+// rodar na abertura (listeners, primeiro desenho da tela...) fica nas funções iniciarX(), chamadas aqui na ordem.
+import { Falha } from './nucleo/falha.js';
+import { $ } from './nucleo/dom.js';
+import { CONFIG } from './motor/config.js';
+import './estrelas/index.js'; // registra todas as Estrelas
+import { Rules } from './motor/regras.js';
+import { Engine } from './motor/engine.js';
+import { definirState, modoEscolhido, state, undoStack } from './partida/estado.js';
+import { iniciarTutorial } from './menus/tutorial.js';
+import { IA } from './bot/ia.js';
+import { Bot } from './bot/bot.js';
+import { abrirMenuOnline, copiarLinkSala, iniciarRede, montarBotoesCriarSala, mostrarPainelMenu, Rede, sairMenuOnline, SALA_TAMANHO } from './online/rede.js';
+import { jogarDeNovo, modosLocais, novaPartida, snapshot } from './partida/partida.js';
+import { atualizarBotaoContinuar, continuarPartida, iniciarSalvamento } from './partida/salvamento.js';
+import { afterStateChange, cleansePiece, collectRenome, commitMove, dealDamage, endActivation, executar, healPiece, undo } from './partida/acoes.js';
+import { ui } from './interface/ui.js';
+import { iniciarIcones } from './interface/icones.js';
+import { cancelAbilityMode, startAbilityMode, trocarPagamento } from './interface/selecao.js';
+import { buildColorButtons, sortearEquipe } from './menus/escolha-equipe.js';
+import { abrirMenuModo, botNivelEscolhido, confirmTeam, escolherModo, escolherNivelBot, showMenu, voltarSelecao } from './menus/menu-principal.js';
+import { view } from './render/canvas.js';
+import { aplicarMapa, iniciarTela, mapaArrastavel, moverMapa } from './render/tela.js';
+import { iniciarHud, refreshHUD } from './hud/hud.js';
+import { updateInspectPanel } from './hud/cartoes.js';
+import { gameRunning } from './partida/loop.js';
+import { beginMatch, Sorteio } from './partida/sorteio.js';
+import { iniciarPonteiro } from './entrada/ponteiro.js';
+import { iniciarVfx } from './render/vfx.js';
+import { abrirPausa, ajudaAberta, fecharPausa, pausaAberta } from './menus/pausa.js';
+import { fecharAjuda, mostrarAjuda, trocarAbaAjuda } from './menus/ajuda.js';
+
+// Inicialização dos módulos (a ordem importa: é a ordem em que o jogo sempre carregou).
+iniciarTutorial();
+iniciarRede();
+iniciarSalvamento();
+iniciarIcones();
+iniciarTela();
+iniciarHud();
+iniciarPonteiro();
+iniciarVfx();
+
+// Erros inesperados: dá ao aviso de erro (nucleo/falha.js) acesso à partida.
+Object.assign(Falha.ganchos, {
+    emJogo: () => !!(gameRunning && state),
+    online: () => Rede.ativo(),
+    podeDesfazer: () => undoStack.length > 0,
+    desfazer: () => undo(),
+    voltarAoMenu: () => showMenu(),
+    estado: () => (state ? snapshot() : ''),
+});
+
 // Esc no jogo: cancela a habilidade → apaga o caminho traçado → solta a ficha fixada → abre o menu de pausa.
 function voltarNoJogo() {
     if (ui.mode) { cancelAbilityMode(); return; }
@@ -102,16 +155,18 @@ atualizarBotaoContinuar();
     if (sala) { abrirMenuOnline(); $('input-codigo').value = sala.toUpperCase().slice(0, SALA_TAMANHO); Rede.entrarSala(sala); }
 }
 
+// Acesso pelo console do navegador (depuração e testes): Game.state, Game.executar(acao), Game.IA.decidir(Game.state)...
 window.Game = {
     CONFIG, Rules, Engine,
     get state() { return state; },
     export() { return snapshot(); },
     import(json) {
-        state = JSON.parse(json);
+        definirState(JSON.parse(json));
         aplicarMapa(state.mapa || 'classico');
         ui.vis = null;
         afterStateChange();
     },
     undo, endActivation, restart: beginMatch, Rede,
-    damage: dealDamage, heal: healPiece, cleanse: cleansePiece, move: commitMove, collect: collectRenome
+    damage: dealDamage, heal: healPiece, cleanse: cleansePiece, move: commitMove, collect: collectRenome,
+    executar, IA, Bot, Sorteio
 };

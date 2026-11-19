@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Teste Z</title>
-    <!-- Segurança: o jogo só pode falar com o servidor de salas do PeerJS (modo online). Imagens, fontes e scripts
-         vêm todos de dentro do projeto; nada externo é carregado. Em desenvolvimento, os arquivos vêm do próprio
-         servidor ('self'); no build (arquivo único) a política volta a ser só 'unsafe-inline' e data:. -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://0.peerjs.com wss://0.peerjs.com; base-uri 'none'; form-action 'none'">
+    <!-- Segurança (CSP): preenchida pelo Vite (ferramentas/vite-jogo.js). No build (arquivo único) o jogo só pode falar
+         com o servidor de salas do PeerJS (modo online); imagens, fontes e scripts vêm todos de dentro do arquivo. -->
+    <meta http-equiv="Content-Security-Policy" content="">
     <meta name="referrer" content="no-referrer">
-    <!-- Impressão digital do código (o modo online só junta jogadores com a mesma). Preenchida pelo servidor e pelo build. -->
+    <!-- Impressão digital do código (o modo online só junta jogadores com a mesma). Preenchida pelo Vite. -->
     <meta name="versao-jogo" content="">
     <link rel="stylesheet" href="css/fontes.css">
     <link rel="stylesheet" href="css/estilo.css">
@@ -179,61 +178,7 @@
 
     <canvas id="gameCanvas"></canvas>
 
-    <!-- Scripts: a ORDEM importa (scripts clássicos dividem o mesmo escopo global; ver CLAUDE.md). -->
-    <script src="js/nucleo/falha.js"></script>
-    <script src="js/nucleo/dom.js"></script>
-    <script src="js/motor/config.js"></script>
-    <script src="js/estrelas/estrelas.js"></script>
-    <script src="js/estrelas/diamante.js"></script>
-    <script src="js/estrelas/lorena.js"></script>
-    <script src="js/estrelas/alex.js"></script>
-    <script src="js/estrelas/toppich.js"></script>
-    <script src="js/estrelas/rato-do-bananal.js"></script>
-    <script src="js/estrelas/garyn.js"></script>
-    <script src="js/estrelas/amina.js"></script>
-    <script src="js/estrelas/vitoria.js"></script>
-    <script src="js/estrelas/nairrun.js"></script>
-    <script src="js/estrelas/siff.js"></script>
-    <script src="js/estrelas/shou-e-cisnela.js"></script>
-    <script src="js/estrelas/icnoyotl.js"></script>
-    <script src="js/estrelas/cassandra.js"></script>
-    <script src="js/estrelas/ricardinho.js"></script>
-    <script src="js/estrelas/billy.js"></script>
-    <script src="js/estrelas/tico.js"></script>
-    <script src="js/estrelas/aurora.js"></script>
-    <script src="js/estrelas/angela.js"></script>
-    <script src="js/motor/regras.js"></script>
-    <script src="js/motor/engine.js"></script>
-    <script src="js/partida/estado.js"></script>
-    <script src="js/menus/tutorial.js"></script>
-    <script src="js/bot/ia.js"></script>
-    <script src="js/bot/bot.js"></script>
-    <script src="js/bot/bot-worker.js"></script>
-    <script src="js/online/rede.js"></script>
-    <script src="js/partida/partida.js"></script>
-    <script src="js/partida/salvamento.js"></script>
-    <script src="js/partida/acoes.js"></script>
-    <script src="js/interface/ui.js"></script>
-    <script src="js/interface/icones.js"></script>
-    <script src="js/interface/resumos.js"></script>
-    <script src="js/interface/glossario.js"></script>
-    <script src="js/interface/selecao.js"></script>
-    <script src="js/menus/escolha-equipe.js"></script>
-    <script src="js/menus/menu-principal.js"></script>
-    <script src="js/render/canvas.js"></script>
-    <script src="js/render/tela.js"></script>
-    <script src="js/render/hex.js"></script>
-    <script src="js/hud/hud.js"></script>
-    <script src="js/hud/cartoes.js"></script>
-    <script src="js/partida/loop.js"></script>
-    <script src="js/partida/sorteio.js"></script>
-    <script src="js/entrada/ponteiro.js"></script>
-    <script src="js/render/desenho.js"></script>
-    <script src="js/render/vfx.js"></script>
-    <script src="js/render/cena.js"></script>
-    <script src="js/menus/pausa.js"></script>
-    <script src="js/menus/ajuda.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/vendor/peerjs.min.js"></script>
+    <!-- Código do jogo: módulos ES a partir de js/main.js (cada arquivo importa o que usa). -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -1,8 +1,12 @@
 // ── Billy ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Engine } from '../motor/engine.js';
+import retratoBilly from '../../assets/retratos/billy.webp';
+
 definirEstrela({
     cor: '#b08968',
-    retrato: 'assets/retratos/billy.webp',
+    retrato: retratoBilly,
     ficha: {
         nome: 'Billy', vida: 9, amago: 11, armadura: 0, agilidade: 3, fisico: 3, magico: 0,
         habilidades: ['billy_pe', 'billy_coceira', 'billy_fumace', 'billy_sentenca']

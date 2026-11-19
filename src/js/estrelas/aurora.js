@@ -1,8 +1,14 @@
 // ── Aurora ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { CONFIG } from '../motor/config.js';
+import { definirEstrela } from './estrelas.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import retratoAurora from '../../assets/retratos/aurora.webp';
+
 definirEstrela({
     cor: '#2dd4bf',
-    retrato: 'assets/retratos/aurora.webp',
+    retrato: retratoAurora,
     ficha: {
         nome: 'Aurora', vida: 11, amago: 14, armadura: 0, agilidade: 2, fisico: 0, magico: 3,
         recursos: { carga: 0 },

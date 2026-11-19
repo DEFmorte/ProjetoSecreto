@@ -1,8 +1,13 @@
 // ── Shou & Cisnela ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import retratoShouECisnela from '../../assets/retratos/shou-e-cisnela.webp';
+
 definirEstrela({
     cor: '#cbd5e1',
-    retrato: 'assets/retratos/shou-e-cisnela.webp',
+    retrato: retratoShouECisnela,
     ficha: {
         nome: 'Shou & Cisnela', vida: 9, amago: 11, armadura: 0, agilidade: 3, fisico: 3, magico: 0,
         habilidades: ['shou_graciosa', 'shou_confianca', 'shou_comando', 'shou_garca']

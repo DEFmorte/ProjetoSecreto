@@ -1,5 +1,4 @@
-// Tailwind 3: gera src/css/tailwind.css só com as classes que aparecem no HTML e nos scripts.
-// Rodado pelo `npm run dev` (modo observação), pelo `npm run build` e pelo `npm run css`.
+// Tailwind 3: gera só as classes que aparecem no HTML e nos scripts (src/css/tailwind.css tem as diretivas).
 module.exports = {
     content: ['./src/index.html', './src/js/**/*.js'],
     theme: { extend: {} },

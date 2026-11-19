@@ -1,5 +1,22 @@
 // ── Pausa / fim de partida ──
-function abrirPausa(vitoria = false) {
+import { $ } from '../nucleo/dom.js';
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { state, undoStack } from '../partida/estado.js';
+import { Bot } from '../bot/bot.js';
+import { Rede } from '../online/rede.js';
+import { jogarDeNovo, novaPartida, OPCOES_VOTO } from '../partida/partida.js';
+import { undo } from '../partida/acoes.js';
+import { icRenome } from '../interface/icones.js';
+import { showMenu } from './menu-principal.js';
+import { ehToque, TelaCheia } from '../render/tela.js';
+import { setPreview } from '../hud/hud.js';
+import { gameRunning } from '../partida/loop.js';
+import { beginMatch } from '../partida/sorteio.js';
+import { VFX } from '../render/vfx.js';
+import { mostrarAjuda } from './ajuda.js';
+
+export function abrirPausa(vitoria = false) {
     if (!gameRunning || !state) return;
     const w = state.winner;
     setPreview(null);
@@ -55,11 +72,11 @@ function abrirPausa(vitoria = false) {
     tela.classList.add('flex');
 }
 
-function fecharPausa() {
+export function fecharPausa() {
     const tela = $('pause-screen');
     tela.classList.add('hidden');
     tela.classList.remove('flex');
 }
 
-const pausaAberta = () => !$('pause-screen').classList.contains('hidden');
-const ajudaAberta = () => !$('help-screen').classList.contains('hidden');
+export const pausaAberta = () => !$('pause-screen').classList.contains('hidden');
+export const ajudaAberta = () => !$('help-screen').classList.contains('hidden');

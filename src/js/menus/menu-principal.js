@@ -1,8 +1,26 @@
+import { $ } from '../nucleo/dom.js';
+import { CONFIG } from '../motor/config.js';
+import { definirModoEscolhido, definirState, definirTeams, definirUndoStack, equipesVazias, modoEscolhido, teams } from '../partida/estado.js';
+import { Tutorial } from './tutorial.js';
+import { IA } from '../bot/ia.js';
+import { Bot } from '../bot/bot.js';
+import { dicaEquipeConfirmada, mostrarPainelMenu, Rede } from '../online/rede.js';
+import { jogadoresDoModo, modosLocais } from '../partida/partida.js';
+import { atualizarBotaoContinuar, salvarPartida } from '../partida/salvamento.js';
+import { ui } from '../interface/ui.js';
+import { clearSelection } from '../interface/selecao.js';
+import { currentSelectingPlayer, definirCurrentSelectingPlayer, definirSelectedColorsForMenu, renderSelectionTitle, selectedColorsForMenu, updateSelectionUI } from './escolha-equipe.js';
+import { ctx, view } from '../render/canvas.js';
+import { definirGameRunning, startGame, stopLoop } from '../partida/loop.js';
+import { Sorteio } from '../partida/sorteio.js';
+import { fecharPausa } from './pausa.js';
+import { fecharAjuda } from './ajuda.js';
+
 // Contra Bots (menu local): escolha do modo. Teclas 1/2 escolhem, D troca o nível; Enter repete o último modo.
-function abrirMenuModo() {
+export function abrirMenuModo() {
     const box = $('modo-opcoes');
     box.innerHTML = '';
-    if (!modosLocais().includes(modoEscolhido)) modoEscolhido = CONFIG.modoLocalPadrao;
+    if (!modosLocais().includes(modoEscolhido)) definirModoEscolhido(CONFIG.modoLocalPadrao);
     for (const id of modosLocais()) {
         const md = CONFIG.modos[id];
         const mapa = CONFIG.mapas[md.mapa];
@@ -25,20 +43,21 @@ function abrirMenuModo() {
     mostrarPainelMenu('modo-menu');
 }
 // Nível do Bot para as próximas partidas (lembrado no navegador); a partida guarda o seu em state.botNivel.
-let botNivelEscolhido = (() => { try { const n = localStorage.getItem('testez_bot_nivel'); return Bot.niveis[n] ? n : Bot.nivelPadrao; } catch (e) { return Bot.nivelPadrao; } })();
-function escolherNivelBot(n) {
+// Lido na carga: usa IA (não Bot), que não depende deste módulo.
+export let botNivelEscolhido = (() => { try { const n = localStorage.getItem('testez_bot_nivel'); return IA.niveis[n] ? n : IA.nivelPadrao; } catch (e) { return IA.nivelPadrao; } })();
+export function escolherNivelBot(n) {
     if (!Bot.niveis[n]) return;
     botNivelEscolhido = n;
     try { localStorage.setItem('testez_bot_nivel', n); } catch (e) { /* ignora */ }
     document.querySelectorAll('#bot-nivel button').forEach(x => x.classList.toggle('on', x.dataset.nivel === n));
 }
 
-function escolherModo(id) {
+export function escolherModo(id) {
     if (!CONFIG.modos[id] || (!Rede.ativo() && !modosLocais().includes(id))) return;
-    modoEscolhido = id;
-    teams = equipesVazias();
-    selectedColorsForMenu = [];
-    currentSelectingPlayer = CONFIG.modos[id].jogadores[0];
+    definirModoEscolhido(id);
+    definirTeams(equipesVazias());
+    definirSelectedColorsForMenu([]);
+    definirCurrentSelectingPlayer(CONFIG.modos[id].jogadores[0]);
     goToSelection();
 }
 
@@ -49,22 +68,22 @@ function goToSelection() {
 }
 
 // Voltar na seleção: jogador N → jogador anterior (com a equipe escolhida), Jogador 1 → escolha de jogadores.
-function voltarSelecao() {
+export function voltarSelecao() {
     if (Rede.ativo()) { showMenu(); return; } // online: sair da sala
     const jog = jogadoresDoModo(), anterior = jog[jog.indexOf(currentSelectingPlayer) - 1];
     if (anterior) {
-        currentSelectingPlayer = anterior;
-        selectedColorsForMenu = [...teams[anterior]];
+        definirCurrentSelectingPlayer(anterior);
+        definirSelectedColorsForMenu([...teams[anterior]]);
         teams[anterior] = [];
         renderSelectionTitle();
         updateSelectionUI();
         return;
     }
-    selectedColorsForMenu = [];
+    definirSelectedColorsForMenu([]);
     abrirMenuModo();
 }
 
-function confirmTeam() {
+export function confirmTeam() {
     if (selectedColorsForMenu.length !== CONFIG.teamSize) return;
     if (Rede.ativo()) {
         if (teams[Rede.eu].length) return;
@@ -78,14 +97,14 @@ function confirmTeam() {
     const jog = jogadoresDoModo(), proximo = jog[jog.indexOf(currentSelectingPlayer) + 1];
     teams[currentSelectingPlayer] = [...selectedColorsForMenu];
     if (proximo) {
-        selectedColorsForMenu = [];
-        currentSelectingPlayer = proximo;
+        definirSelectedColorsForMenu([]);
+        definirCurrentSelectingPlayer(proximo);
         renderSelectionTitle();
         updateSelectionUI();
     } else startGame();
 }
 
-function showMenu() {
+export function showMenu() {
     salvarPartida(); // não perde a última jogada (o salvamento é adiado alguns ms)
     if (Rede.ativo()) Rede.encerrar();
     sairDaPartida('main-menu');
@@ -93,14 +112,14 @@ function showMenu() {
 }
 
 // Fecha a partida e volta à tela de menus (sem desconectar). painel null: quem chamou escolhe o painel.
-function sairDaPartida(painel = 'main-menu') {
+export function sairDaPartida(painel = 'main-menu') {
     stopLoop();
-    gameRunning = false;
-    state = null;
-    undoStack = [];
-    teams = equipesVazias();
-    selectedColorsForMenu = [];
-    currentSelectingPlayer = 1;
+    definirGameRunning(false);
+    definirState(null);
+    definirUndoStack([]);
+    definirTeams(equipesVazias());
+    definirSelectedColorsForMenu([]);
+    definirCurrentSelectingPlayer(1);
     clearSelection();
     ui.vis = null; ui.floats = []; ui.anims = {}; ui.previewId = null; ui.vitoriaVista = null;
     Tutorial.parar();

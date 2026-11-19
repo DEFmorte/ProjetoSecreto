@@ -2,7 +2,21 @@
 // O Bot joga pelos jogadores indicados em CONFIG.modos[modo].bots (cada um por si): quando é a vez dele, pede a
 // jogada para a IA (ia.js) — em segundo plano, pelo BotWorker — e aplica. As rolagens da partida contra o Bot são
 // automáticas. Ele espera alguns instantes entre as jogadas para dar para acompanhar.
-const Bot = {
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import { state } from '../partida/estado.js';
+import { IA } from './ia.js';
+import { BotWorker } from './bot-worker.js';
+import { Rede } from '../online/rede.js';
+import { botsDoModo } from '../partida/partida.js';
+import { afterStateChange, aplicarAcao } from '../partida/acoes.js';
+import { gameRunning } from '../partida/loop.js';
+import { Sorteio } from '../partida/sorteio.js';
+import { VFX } from '../render/vfx.js';
+import { ajudaAberta, pausaAberta } from '../menus/pausa.js';
+
+export const Bot = {
     // Níveis de dificuldade: ver IA.niveis (ia.js).
     get niveis() { return IA.niveis; },
     get nivelPadrao() { return IA.nivelPadrao; },

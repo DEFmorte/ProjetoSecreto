@@ -9,11 +9,13 @@
 //                js/motor/engine.js (Engine.EFFECTS lista os tipos de efeito).
 // Estrela nova: crie o arquivo e adicione-o em src/index.html e em js/bot/worker.js (depois de estrelas.js).
 // Engine.validarConfig() avisa no console se uma habilidade da ficha não existir.
+import { CONFIG } from '../motor/config.js';
+
 
 // Retrato de cada Estrela, pelo nome (usado pela interface).
-const RETRATOS = {};
+export const RETRATOS = {};
 
-function definirEstrela({ cor, retrato = null, ficha, habilidades = {} }) {
+export function definirEstrela({ cor, retrato = null, ficha, habilidades = {} }) {
     if (CONFIG.estrelas[cor]) throw new Error(`Estrela repetida: ${cor} (${ficha.nome} e ${CONFIG.estrelas[cor].nome})`);
     CONFIG.estrelas[cor] = ficha;
     for (const [id, def] of Object.entries(habilidades)) {

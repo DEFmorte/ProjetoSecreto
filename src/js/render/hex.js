@@ -1,4 +1,6 @@
-function hexToPixel(q, r) {
+import { view } from './canvas.js';
+
+export function hexToPixel(q, r) {
     const s = view.hexR;
     return {
         x: s * (3 / 2 * q) + view.originX,
@@ -6,7 +8,7 @@ function hexToPixel(q, r) {
     };
 }
 
-function pixelToHex(x, y) {
+export function pixelToHex(x, y) {
     const s = view.hexR;
     const px = (x - view.originX) / s;
     const py = (y - view.originY) / s;

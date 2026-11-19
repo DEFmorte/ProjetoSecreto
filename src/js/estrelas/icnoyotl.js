@@ -1,8 +1,13 @@
 // ── Icnoyotl ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import retratoIcnoyotl from '../../assets/retratos/icnoyotl.webp';
+
 definirEstrela({
     cor: '#d97706',
-    retrato: 'assets/retratos/icnoyotl.webp',
+    retrato: retratoIcnoyotl,
     ficha: {
         nome: 'Icnoyotl', vida: 11, amago: 9, armadura: 0, agilidade: 3, fisico: 0, magico: 3,
         recursos: { penas: 0 },

@@ -5,14 +5,18 @@
   "description": "Teste Z / PlayZinordia — jogo de tabuleiro hexagonal no navegador.",
   "type": "module",
   "scripts": {
-    "dev": "node ferramentas/servidor.mjs",
-    "dev:rede": "node ferramentas/servidor.mjs --rede",
-    "build": "node ferramentas/build.mjs",
-    "preview": "node ferramentas/servidor.mjs --dist",
-    "css": "tailwindcss -c tailwind.config.cjs -i ferramentas/tailwind.entrada.css -o src/css/tailwind.css --minify",
-    "checar": "node ferramentas/checar.mjs"
+    "dev": "vite",
+    "dev:rede": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "peerjs": "1.5.4"
   },
   "devDependencies": {
-    "tailwindcss": "3.4.19"
+    "postcss": "8.5.33",
+    "tailwindcss": "3.4.19",
+    "vite": "8.3.5",
+    "vite-plugin-singlefile": "2.3.4"
   }
 }

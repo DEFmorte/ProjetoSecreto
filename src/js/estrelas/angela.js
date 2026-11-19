@@ -1,8 +1,12 @@
 // ── Ângela ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Rules } from '../motor/regras.js';
+import retratoAngela from '../../assets/retratos/angela.webp';
+
 definirEstrela({
     cor: '#fde68a',
-    retrato: 'assets/retratos/angela.webp',
+    retrato: retratoAngela,
     ficha: {
         nome: 'Ângela', vida: 14, amago: 11, armadura: 0, agilidade: 3, fisico: 2, magico: 0,
         recursos: { penitencia: 0 },

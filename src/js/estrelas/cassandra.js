@@ -1,8 +1,12 @@
 // ── Cassandra ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Engine } from '../motor/engine.js';
+import retratoCassandra from '../../assets/retratos/cassandra.webp';
+
 definirEstrela({
     cor: '#2563eb',
-    retrato: 'assets/retratos/cassandra.webp',
+    retrato: retratoCassandra,
     ficha: {
         nome: 'Cassandra', vida: 13, amago: 11, armadura: 1, agilidade: 2, fisico: 2, magico: 0,
         habilidades: ['cassandra_egide', 'cassandra_punir', 'cassandra_compelir', 'cassandra_tenente']

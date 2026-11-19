@@ -1,8 +1,12 @@
 // ── Rato do Bananal ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Rules } from '../motor/regras.js';
+import retratoRatoDoBananal from '../../assets/retratos/rato-do-bananal.webp';
+
 definirEstrela({
     cor: '#eab308',
-    retrato: 'assets/retratos/rato-do-bananal.webp',
+    retrato: retratoRatoDoBananal,
     ficha: {
         nome: 'Rato do Bananal', vida: 11, amago: 14, armadura: 0, agilidade: 2, fisico: 0, magico: 3,
         habilidades: ['rato_bananation', 'rato_bananada', 'rato_cacho', 'rato_bananeira']

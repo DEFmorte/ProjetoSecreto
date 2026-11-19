@@ -1,8 +1,12 @@
 // ── Toppich ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Rules } from '../motor/regras.js';
+import retratoToppich from '../../assets/retratos/toppich.webp';
+
 definirEstrela({
     cor: '#84cc16',
-    retrato: 'assets/retratos/toppich.webp',
+    retrato: retratoToppich,
     ficha: {
         nome: 'Toppich', vida: 11, amago: 7, armadura: 2, agilidade: 2, fisico: 2, magico: 0,
         habilidades: ['toppich_impulso', 'toppich_martelada', 'toppich_projecao', 'toppich_trinvestida']

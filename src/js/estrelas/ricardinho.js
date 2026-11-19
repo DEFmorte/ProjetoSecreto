@@ -1,8 +1,12 @@
 // ── Ricardinho ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Engine } from '../motor/engine.js';
+import retratoRicardinho from '../../assets/retratos/ricardinho.webp';
+
 definirEstrela({
     cor: '#64748b',
-    retrato: 'assets/retratos/ricardinho.webp',
+    retrato: retratoRicardinho,
     ficha: {
         nome: 'Ricardinho', vida: 10, amago: 15, armadura: 0, agilidade: 3, fisico: 2, magico: 0,
         objetos: ['shuriken'],

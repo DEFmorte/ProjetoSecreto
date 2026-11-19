@@ -1,4 +1,7 @@
-const Rules = {
+import { CONFIG } from './config.js';
+import { Engine } from './engine.js';
+
+export const Rules = {
     DIRS: [{ q: 1, r: 0 }, { q: 1, r: -1 }, { q: 0, r: -1 }, { q: -1, r: 0 }, { q: -1, r: 1 }, { q: 0, r: 1 }],
 
     // Mapa ativo (CONFIG.mapas). Trocar de mapa limpa os caches de zonas e distâncias.

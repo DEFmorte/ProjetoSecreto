@@ -1,7 +1,55 @@
 // ── Arrastar o mapa ──
 // Botão do meio arrasta sempre; botão principal/toque arrasta quando começa fora de uma Estrela selecionável e fora do
 // caminho (zonas verdes). Só vira arrasto depois de alguns px — antes disso é um clique normal.
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { state } from '../partida/estado.js';
+import { commitMove } from '../partida/acoes.js';
+import { ui } from '../interface/ui.js';
+import { clearSelection, handleTargetClick, selectedPiece, selectPiece } from '../interface/selecao.js';
+import { canvas } from '../render/canvas.js';
+import { mapaArrastavel, moverMapa } from '../render/tela.js';
+import { setPreview } from '../hud/hud.js';
+import { setHover, updateInspectPanel } from '../hud/cartoes.js';
+import { gameRunning } from '../partida/loop.js';
+import { eventHex } from '../partida/sorteio.js';
+
 const arrasto = { id: null, x: 0, y: 0, ativo: false };
+const fimArrasto = (e) => {
+    if (arrasto.id !== e.pointerId) return;
+    const estava = arrasto.ativo;
+    arrasto.id = null; arrasto.ativo = false;
+    if (estava) {
+        canvas.style.cursor = mapaArrastavel() ? 'grab' : '';
+        ui.lastClickHex = null;
+        e.stopImmediatePropagation(); // não conta como clique
+    }
+};
+
+// Caminho mais curto (zonas livres, dentro do movimento restante) da Estrela até a zona; null se não houver.
+function caminhoAte(piece, alvo) {
+    const max = Rules.movementLeft(piece), k = h => `${h.q},${h.r}`;
+    const ant = new Map([[k(piece), null]]), fila = [{ q: piece.q, r: piece.r, d: 0 }];
+    for (let i = 0; i < fila.length; i++) {
+        const c = fila[i];
+        if (c.q === alvo.q && c.r === alvo.r) {
+            const cam = [];
+            for (let h = c; h; h = ant.get(k(h))) cam.unshift({ q: h.q, r: h.r });
+            return cam;
+        }
+        if (c.d >= max) continue;
+        for (const n of Rules.neighbors(c.q, c.r)) {
+            if (ant.has(k(n)) || !Rules.isHexOnBoard(n.q, n.r)) continue;
+            if (CONFIG.rules.piecesBlockMovement && Rules.pieceAt(state, n.q, n.r)) continue;
+            ant.set(k(n), c);
+            fila.push({ q: n.q, r: n.r, d: c.d + 1 });
+        }
+    }
+    return null;
+}
+
+// Executado uma vez na inicialização do jogo (main.js), na ordem certa em relação aos outros módulos.
+export function iniciarPonteiro() {
 canvas.addEventListener('pointerdown', (e) => {
     arrasto.id = null; arrasto.ativo = false;
     if (!gameRunning || !state || !mapaArrastavel()) return;
@@ -32,16 +80,6 @@ canvas.addEventListener('pointermove', (e) => {
     moverMapa(dx, dy);
     e.stopImmediatePropagation();
 });
-const fimArrasto = (e) => {
-    if (arrasto.id !== e.pointerId) return;
-    const estava = arrasto.ativo;
-    arrasto.id = null; arrasto.ativo = false;
-    if (estava) {
-        canvas.style.cursor = mapaArrastavel() ? 'grab' : '';
-        ui.lastClickHex = null;
-        e.stopImmediatePropagation(); // não conta como clique
-    }
-};
 canvas.addEventListener('pointerup', fimArrasto);
 canvas.addEventListener('pointercancel', fimArrasto);
 canvas.addEventListener('auxclick', (e) => { if (e.button === 1) e.preventDefault(); });
@@ -53,7 +91,6 @@ canvas.addEventListener('wheel', (e) => {
     if (e.shiftKey) moverMapa(-e.deltaY * k, 0);
     else moverMapa(-e.deltaX * k, -e.deltaY * k);
 }, { passive: false });
-
 canvas.addEventListener('pointerdown', (e) => {
     if (gameRunning && e.pointerType !== 'mouse' && ui.previewId) setPreview(null);
     if (!gameRunning || state.winner || state.pending || ui.mode) return;
@@ -64,7 +101,6 @@ canvas.addEventListener('pointerdown', (e) => {
         ui.justSelected = true;
     }
 });
-
 canvas.addEventListener('pointermove', (e) => {
     if (gameRunning && state && e.pointerType === 'mouse') {
         const h = eventHex(e), sob = Rules.pieceAt(state, h.q, h.r);
@@ -86,9 +122,7 @@ canvas.addEventListener('pointermove', (e) => {
         ui.dragging = true;
     }
 });
-
 canvas.addEventListener('pointerleave', () => setHover(null));
-
 canvas.addEventListener('pointerup', (e) => {
     if (!gameRunning) return;
     const hex = eventHex(e);
@@ -147,25 +181,4 @@ canvas.addEventListener('pointerup', (e) => {
     }
     ui.dragging = false;
 });
-
-// Caminho mais curto (zonas livres, dentro do movimento restante) da Estrela até a zona; null se não houver.
-function caminhoAte(piece, alvo) {
-    const max = Rules.movementLeft(piece), k = h => `${h.q},${h.r}`;
-    const ant = new Map([[k(piece), null]]), fila = [{ q: piece.q, r: piece.r, d: 0 }];
-    for (let i = 0; i < fila.length; i++) {
-        const c = fila[i];
-        if (c.q === alvo.q && c.r === alvo.r) {
-            const cam = [];
-            for (let h = c; h; h = ant.get(k(h))) cam.unshift({ q: h.q, r: h.r });
-            return cam;
-        }
-        if (c.d >= max) continue;
-        for (const n of Rules.neighbors(c.q, c.r)) {
-            if (ant.has(k(n)) || !Rules.isHexOnBoard(n.q, n.r)) continue;
-            if (CONFIG.rules.piecesBlockMovement && Rules.pieceAt(state, n.q, n.r)) continue;
-            ant.set(k(n), c);
-            fila.push({ q: n.q, r: n.r, d: c.d + 1 });
-        }
-    }
-    return null;
 }

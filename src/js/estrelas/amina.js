@@ -1,8 +1,13 @@
 // ── Amina ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import retratoAmina from '../../assets/retratos/amina.webp';
+
 definirEstrela({
     cor: '#a855f7',
-    retrato: 'assets/retratos/amina.webp',
+    retrato: retratoAmina,
     ficha: {
         nome: 'Amina', vida: 9, amago: 16, armadura: 0, agilidade: 2, fisico: 0, magico: 3,
         habilidades: ['amina_selo', 'amina_luz', 'amina_pulso', 'amina_benevolencia']

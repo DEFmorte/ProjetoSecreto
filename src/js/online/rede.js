@@ -1,9 +1,23 @@
 // ── Online (P2P via WebRTC com PeerJS) ──
 // O anfitrião (Jogador 1) é a autoridade: guarda o estado, aplica as ações dos dois jogadores e envia o estado ao convidado
 // (Jogador 2), que só desenha. Mensagens: convidado → {ola, equipe, acao, revanche, tchau}; anfitrião → {selecao, inicio, estado, aviso, tchau}.
+import { Peer } from 'peerjs';
+import { $ } from '../nucleo/dom.js';
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { definirState, definirTeams, equipesVazias, state, teams } from '../partida/estado.js';
+import { IA } from '../bot/ia.js';
+import { Bot } from '../bot/bot.js';
+import { atualizarFimDePartida, botsDoModo, OPCOES_VOTO, snapshot } from '../partida/partida.js';
+import { afterStateChange, executar } from '../partida/acoes.js';
+import { definirCurrentSelectingPlayer, definirSelectedColorsForMenu, renderSelectionTitle, updateSelectionUI } from '../menus/escolha-equipe.js';
+import { sairDaPartida } from '../menus/menu-principal.js';
+import { gameRunning, startGame } from '../partida/loop.js';
+import { beginMatch } from '../partida/sorteio.js';
+
 const SALA_PREFIXO = 'testez-';
 const SALA_LETRAS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-const SALA_TAMANHO = 6; // 32^6 ≈ 1 bilhão de códigos: inviável adivinhar uma sala
+export const SALA_TAMANHO = 6; // 32^6 ≈ 1 bilhão de códigos: inviável adivinhar uma sala
 // Sorteio criptográfico (não previsível como Math.random). n caracteres de `letras`.
 function sortearTexto(n, letras = SALA_LETRAS) {
     const v = new Uint32Array(n);
@@ -11,7 +25,7 @@ function sortearTexto(n, letras = SALA_LETRAS) {
     return Array.from(v, x => letras[x % letras.length]).join('');
 }
 
-const Rede = {
+export const Rede = {
     papel: null,        // null (local) | 'anfitriao' | 'convidado'
     eu: 1,
     modo: 'duelo',      // modo da sala (definido pelo anfitrião ao criar)
@@ -124,16 +138,8 @@ const Rede = {
         }).join('');
     },
 
-    // PeerJS vem embutido no arquivo (último <script>).
-    carregar() {
-        // O PeerJS vem embutido no fim da página; se ainda não foi lido (ex.: link ?sala=), espera o carregamento.
-        if (window.Peer) return Promise.resolve();
-        return new Promise((ok, erro) => {
-            const conferir = () => window.Peer ? ok() : erro(new Error('Módulo online indisponível.'));
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', conferir, { once: true });
-            else conferir();
-        });
-    },
+    // PeerJS (pacote npm "peerjs") vai junto no código do jogo: não há o que carregar.
+    carregar() { return Promise.resolve(); },
 
     // Mensagem de erro do PeerJS para o jogador.
     textoErro(err) {
@@ -167,7 +173,7 @@ const Rede = {
 
     abrirSala() {
         const codigo = sortearTexto(SALA_TAMANHO);
-        const peer = this.peer = new window.Peer(SALA_PREFIXO + codigo);
+        const peer = this.peer = new Peer(SALA_PREFIXO + codigo);
         peer.on('open', () => {
             if (peer !== this.peer) return;
             this.codigo = codigo;
@@ -195,7 +201,7 @@ const Rede = {
         this.status(`Conectando à sala ${codigo}…`);
         try { await this.carregar(); } catch (e) { this.falhar(e.message); return; }
         if (this.papel !== 'convidado') return;
-        const peer = this.peer = new window.Peer();
+        const peer = this.peer = new Peer();
         peer.on('open', () => { if (peer === this.peer) this.conectar(); });
         peer.on('error', err => {
             if (peer !== this.peer) return;
@@ -504,7 +510,7 @@ const Rede = {
                 const eq = Array.isArray(msg.equipe) ? msg.equipe.filter(c => CONFIG.estrelas[c]) : [];
                 if (eq.length === CONFIG.teamSize) { // reconectou: a equipe já confirmada continua valendo
                     teams[this.eu] = [...eq];
-                    selectedColorsForMenu = [...eq];
+                    definirSelectedColorsForMenu([...eq]);
                     updateSelectionUI();
                     $('selection-hint').innerText = dicaEquipeConfirmada();
                 } else if (teams[this.eu].length) this.enviar({ t: 'equipe', cores: teams[this.eu] });
@@ -522,7 +528,7 @@ const Rede = {
             case 'estado': {
                 const est = gameRunning && this.estadoSeguro(msg.estado);
                 if (!est) return;
-                state = est;
+                definirState(est);
                 afterStateChange();
                 return;
             }
@@ -608,9 +614,9 @@ function atualizarMenuOnline() {
     $('btn-online-back').innerHTML = `${dentro ? '← Sair da sala' : '← Menu'} <span class="kbd">Esc</span>`;
 }
 
-const dicaEquipeConfirmada = () => `EQUIPE CONFIRMADA — AGUARDANDO ${Rede.jogadoresSala().length > 2 ? 'OS OUTROS JOGADORES' : 'O ADVERSÁRIO'}…`;
+export const dicaEquipeConfirmada = () => `EQUIPE CONFIRMADA — AGUARDANDO ${Rede.jogadoresSala().length > 2 ? 'OS OUTROS JOGADORES' : 'O ADVERSÁRIO'}…`;
 
-function montarBotoesCriarSala() {
+export function montarBotoesCriarSala() {
     const box = $('criar-sala-botoes');
     box.innerHTML = '';
     Object.entries(CONFIG.modos).filter(([id]) => !botsDoModo(id).length).forEach(([id, md], i) => {
@@ -624,17 +630,7 @@ function montarBotoesCriarSala() {
     });
 }
 
-// Online, cada jogador só seleciona/age com as próprias Estrelas (o anfitrião libera as duas ao aplicar ações).
-// Contra o Bot, o mesmo vale para as Estrelas do Bot.
-{
-    const base = Rules.canSelect;
-    Rules.canSelect = function (state, piece) {
-        return base.call(this, state, piece) && (!Rede.ativo() || Rede.aplicando || piece.player === Rede.eu)
-            && (Bot.aplicando || IA.aplicando || !Bot.ehBot(piece.player, state)); // contra Bots: as Estrelas deles só agem pelo Bot
-    };
-}
-
-function mostrarPainelMenu(id) {
+export function mostrarPainelMenu(id) {
     ['main-menu', 'modo-menu', 'online-menu', 'selection-menu'].forEach(x => {
         const el = $(x);
         el.classList.toggle('hidden', x !== id);
@@ -642,13 +638,13 @@ function mostrarPainelMenu(id) {
     });
 }
 
-function abrirMenuOnline() {
+export function abrirMenuOnline() {
     mostrarPainelMenu('online-menu');
     if (!Rede.ativo()) Rede.status('');
     $('input-codigo').focus();
 }
 
-function sairMenuOnline() {
+export function sairMenuOnline() {
     Rede.encerrar();
     mostrarPainelMenu('main-menu');
 }
@@ -657,9 +653,9 @@ const emSelecaoOnline = () => Rede.ativo() && !$('selection-menu').classList.con
 
 // Seleção online: cada jogador monta a própria equipe ao mesmo tempo.
 function entrarSelecaoOnline() {
-    teams = equipesVazias();
-    selectedColorsForMenu = [];
-    currentSelectingPlayer = Rede.eu;
+    definirTeams(equipesVazias());
+    definirSelectedColorsForMenu([]);
+    definirCurrentSelectingPlayer(Rede.eu);
     const menu = $('menu-screen');
     menu.style.display = 'flex';
     menu.classList.remove('hidden-menu');
@@ -669,10 +665,23 @@ function entrarSelecaoOnline() {
     Rede.atualizarStatus();
 }
 
-function copiarLinkSala() {
+export function copiarLinkSala() {
     if (!Rede.codigo) return;
     const link = `${location.href.split(/[?#]/)[0]}?sala=${Rede.codigo}`;
     const ok = () => Rede.status(location.protocol === 'file:' ? 'Link copiado (só funciona com o jogo hospedado na internet).' : `Link copiado! Envie ${Rede.jogadoresSala().length > 2 ? 'aos outros jogadores' : 'ao adversário'}.`);
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(ok, () => prompt('Copie o link:', link));
     else prompt('Copie o link:', link);
+}
+
+// Executado uma vez na inicialização do jogo (main.js), na ordem certa em relação aos outros módulos.
+export function iniciarRede() {
+// Online, cada jogador só seleciona/age com as próprias Estrelas (o anfitrião libera as duas ao aplicar ações).
+// Contra o Bot, o mesmo vale para as Estrelas do Bot.
+{
+    const base = Rules.canSelect;
+    Rules.canSelect = function (state, piece) {
+        return base.call(this, state, piece) && (!Rede.ativo() || Rede.aplicando || piece.player === Rede.eu)
+            && (Bot.aplicando || IA.aplicando || !Bot.ehBot(piece.player, state)); // contra Bots: as Estrelas deles só agem pelo Bot
+    };
+}
 }

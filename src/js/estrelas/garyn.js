@@ -1,8 +1,12 @@
 // ── Garyn ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import { Engine } from '../motor/engine.js';
+import retratoGaryn from '../../assets/retratos/garyn.webp';
+
 definirEstrela({
     cor: '#ef4444',
-    retrato: 'assets/retratos/garyn.webp',
+    retrato: retratoGaryn,
     ficha: {
         nome: 'Garyn', vida: 14, amago: 10, armadura: 1, agilidade: 2, fisico: 2, magico: 0,
         habilidades: ['garyn_defesa', 'garyn_machadada', 'garyn_investida', 'garyn_circular']

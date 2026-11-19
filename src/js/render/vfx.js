@@ -4,6 +4,16 @@
 // Coordenadas "de mundo" em raios de zona (x = 1,5q; y = √3(q/2 + r)): acompanham o arrasto e o tamanho da tela.
 // Estilo por habilidade: e = entrega (projetil, feixe, corpo, giro, onda, pilares, leque, investida, salto, volta, apoio,
 // proprio, direto, nada), f = forma, c = cor, i = impacto (corte, pesado, cristal, energia, explosao, brilho), x = extra.
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import { state } from '../partida/estado.js';
+import { ui } from '../interface/ui.js';
+import { COR } from '../interface/icones.js';
+import { retrato } from '../menus/escolha-equipe.js';
+import { ctx, view } from './canvas.js';
+import { caminhoArredondado, drawContadores, drawHexagon, drawLabel, drawShuriken, drawTextoContorno, posPeca } from './desenho.js';
+
 const VFX_ESTILOS = {
     diamante_reflexo: { e: 'projetil', f: 'cristal', c: '#67e8f9', i: 'cristal' },
     diamante_punho: { e: 'corpo', f: 'soco', c: '#67e8f9', i: 'cristal' },
@@ -83,7 +93,7 @@ const VFX_ESTILOS = {
     angela_consagracao: { e: 'proprio', c: '#fde68a', x: 'selo' }
 };
 
-const VFX = {
+export const VFX = {
     NIVEIS: ['completo', 'reduzido', 'desligado'],
     NOMES: { completo: 'Completos', reduzido: 'Reduzidos', desligado: 'Desligados' },
     MAX_PARTS: 450,
@@ -1172,4 +1182,8 @@ const VFX = {
         }
     }
 };
+
+// Executado uma vez na inicialização do jogo (main.js), na ordem certa em relação aos outros módulos.
+export function iniciarVfx() {
 VFX.iniciar();
+}

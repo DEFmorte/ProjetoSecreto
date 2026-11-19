@@ -1,9 +1,19 @@
 // ── Erros inesperados ──
 // Em vez de o jogo travar em silêncio, mostra um aviso com opções: desfazer a última jogada, continuar,
-// voltar ao menu ou copiar os detalhes (para relatar o problema). Usa funções do script principal só se existirem.
-const Falha = {
+// voltar ao menu ou copiar os detalhes (para relatar o problema).
+// Este módulo é o primeiro a carregar e não importa nada do jogo (para pegar erros de qualquer outro módulo). O acesso
+// à partida vem por Falha.ganchos, que o main.js liga depois que tudo carregou.
+export const Falha = {
     silenciados: new Set(), // erros que o jogador mandou ignorar ("Continuar")
     atual: null,
+    ganchos: {
+        emJogo: () => false,       // há uma partida em andamento?
+        online: () => false,       // partida online?
+        podeDesfazer: () => false, // há jogada para desfazer?
+        desfazer: () => {},
+        voltarAoMenu: () => location.reload(),
+        estado: () => '',          // estado da partida em texto (para o relatório)
+    },
     aberto() { return !!document.getElementById('erro-screen'); },
     mostrar(erro, origem = 'erro') {
         const msg = (erro && (erro.message || (typeof erro === 'string' ? erro : ''))) || String(erro || 'Erro desconhecido');
@@ -19,15 +29,15 @@ const Falha = {
     detalhes() {
         const a = this.atual || {};
         let estado = '';
-        try { estado = typeof snapshot === 'function' && state ? snapshot() : ''; } catch (e) { estado = '(indisponível)'; }
+        try { estado = this.ganchos.estado(); } catch (e) { estado = '(indisponível)'; }
         return ['TESTE Z — relatório de erro', `Quando: ${a.quando}`, `Origem: ${a.origem}`, `Mensagem: ${a.msg}`,
             `Navegador: ${navigator.userAgent}`, '', a.stack, '', 'Estado da partida:', estado].join('\n');
     },
     fechar() { const el = document.getElementById('erro-screen'); if (el) el.remove(); },
     abrir() {
         const a = this.atual;
-        const emJogo = typeof gameRunning !== 'undefined' && gameRunning && state;
-        const online = typeof Rede !== 'undefined' && Rede.ativo();
+        const emJogo = this.ganchos.emJogo();
+        const online = this.ganchos.online();
         const tela = document.createElement('div');
         tela.id = 'erro-screen';
         tela.className = 'fixed inset-0 flex items-center justify-center bg-gray-950/70 backdrop-blur-sm p-4';
@@ -48,12 +58,12 @@ const Falha = {
             box.appendChild(b);
             return b;
         };
-        const podeDesfazer = emJogo && undoStack.length && !online;
-        if (podeDesfazer) botao('Desfazer última jogada', 'primario', () => { this.fechar(); undo(); });
+        const podeDesfazer = emJogo && this.ganchos.podeDesfazer() && !online;
+        if (podeDesfazer) botao('Desfazer última jogada', 'primario', () => { this.fechar(); this.ganchos.desfazer(); });
         botao('Continuar', podeDesfazer ? '' : 'primario', () => { this.silenciados.add(a.chave); this.fechar(); });
         botao(emJogo ? 'Voltar ao menu' : 'Recarregar a página', '', () => {
             this.fechar();
-            if (emJogo && typeof showMenu === 'function') showMenu(); else location.reload();
+            if (emJogo) this.ganchos.voltarAoMenu(); else location.reload();
         });
         botao('Copiar detalhes', '', (b) => {
             const txt = this.detalhes();

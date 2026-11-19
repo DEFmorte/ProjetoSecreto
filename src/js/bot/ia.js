@@ -4,7 +4,11 @@
 // Nas simulações, cada ataque vale pela chance de acerto; reações e escolhas do adversário contam como o pior caso.
 // Não usa nada da tela: roda na página, no Worker (js/bot/worker.js) e nos testes. Quem joga na partida é o Bot
 // (bot.js), que pede a decisão para a IA.
-const IA = {
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+
+export const IA = {
     // Níveis (escolhidos no menu "Contra Bots", guardados na partida em state.botNivel):
     //   orcamentoMs: tempo máximo de cálculo por decisão (depois disso as simulações ficam mais simples)
     //   ruido: variação aleatória na pontuação (nem sempre a jogada perfeita)

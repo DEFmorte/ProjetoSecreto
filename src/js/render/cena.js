@@ -1,3 +1,17 @@
+import { Falha } from '../nucleo/falha.js';
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import { state } from '../partida/estado.js';
+import { ui } from '../interface/ui.js';
+import { iconePronto } from '../interface/icones.js';
+import { retrato } from '../menus/escolha-equipe.js';
+import { ctx, renderCache, view } from './canvas.js';
+import { hexToPixel } from './hex.js';
+import { definirLoopHandle, gameRunning } from '../partida/loop.js';
+import { drawCircle, drawContadores, drawContagem, drawHexagon, drawIcone, drawLabel, drawRecursoBadge, drawRenomeBadge, drawRenomeMarker, drawShuriken, drawTextoContorno, getBoardLayer, posPeca } from './desenho.js';
+import { VFX } from './vfx.js';
+
 // Números flutuantes (dano, cura, Âmago, Armadura, esquiva): sobem e somem (os grandes surgem com um "pulo").
 const FLOAT_MS = 1400;
 function drawFloats(t) {
@@ -15,11 +29,11 @@ function drawFloats(t) {
 }
 
 // Um erro ao desenhar um quadro não para o jogo: avisa uma vez e segue desenhando os próximos.
-function gameLoop(timestamp) {
+export function gameLoop(timestamp) {
     if (!gameRunning || !state) return;
     try { desenharQuadro(timestamp); }
     catch (err) { Falha.mostrar(err, 'desenho'); }
-    if (gameRunning) loopHandle = requestAnimationFrame(gameLoop);
+    if (gameRunning) definirLoopHandle(requestAnimationFrame(gameLoop));
 }
 
 // Tremor da tela (efeitos visuais) desloca a cena; faixa de turno e confete ficam por cima, sem tremer.

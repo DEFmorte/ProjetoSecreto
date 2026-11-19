@@ -1,8 +1,11 @@
 // ── Vitória ──
 // Ficha (atributos e lista de habilidades), habilidades e retrato. Formato explicado em js/estrelas/estrelas.js.
+import { definirEstrela } from './estrelas.js';
+import retratoVitoria from '../../assets/retratos/vitoria.webp';
+
 definirEstrela({
     cor: '#818cf8',
-    retrato: 'assets/retratos/vitoria.webp',
+    retrato: retratoVitoria,
     ficha: {
         nome: 'Vitória', vida: 9, amago: 16, armadura: 0, agilidade: 3, fisico: 0, magico: 2,
         habilidades: ['vitoria_veu', 'vitoria_cortina', 'vitoria_recompensa', 'vitoria_presente']

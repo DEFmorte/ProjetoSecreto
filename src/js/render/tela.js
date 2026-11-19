@@ -1,5 +1,13 @@
 // ── Celular: tela cheia + trava na horizontal (Android/Chrome; o iPhone não permite e usa o aviso #girar-tela) ──
-const TelaCheia = {
+import { $ } from '../nucleo/dom.js';
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { state } from '../partida/estado.js';
+import { ui } from '../interface/ui.js';
+import { canvas, ctx, definirBoardLayer, view } from './canvas.js';
+import { refreshHUD } from '../hud/hud.js';
+
+export const TelaCheia = {
     disponivel() { return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled); },
     ativa() { return !!(document.fullscreenElement || document.webkitFullscreenElement); },
     async entrar() {
@@ -17,12 +25,8 @@ const TelaCheia = {
         $('btn-girar').classList.toggle('hidden', !(this.disponivel() && screen.orientation && screen.orientation.lock));
     }
 };
-function ehToque() { return matchMedia('(pointer: coarse)').matches; }
-function ehCompacto() { return document.documentElement.classList.contains('compacto'); }
-document.addEventListener('fullscreenchange', () => TelaCheia.atualizarBotoes());
-document.addEventListener('webkitfullscreenchange', () => TelaCheia.atualizarBotoes());
-$('btn-tela-cheia').addEventListener('click', () => TelaCheia.alternar());
-$('btn-girar').addEventListener('click', () => TelaCheia.entrar());
+export function ehToque() { return matchMedia('(pointer: coarse)').matches; }
+export function ehCompacto() { return document.documentElement.classList.contains('compacto'); }
 
 // Celular deitado (pouca altura): liga o layout compacto e move banner/avisos/habilidades para as colunas laterais,
 // deixando a altura toda para o tabuleiro. Devolve true se está compacto.
@@ -49,7 +53,7 @@ function aplicarCompacto() {
 
 // Área livre para o tabuleiro: desconta o HUD (faixa superior = banner, inferior = habilidades/avisos,
 // laterais = colunas de painéis em telas largas). Mantenha em sintonia com --hud-col/--hud-gap no CSS.
-const HUD = { larga: 1000, topo: 84, base: 92, lateral: 15 * 16 + 2 * 16 };
+export const HUD = { larga: 1000, topo: 84, base: 92, lateral: 15 * 16 + 2 * 16 };
 function resizeCanvas() {
     view.dpr = window.devicePixelRatio || 1;
     view.width = window.innerWidth;
@@ -57,7 +61,7 @@ function resizeCanvas() {
     canvas.width = Math.round(view.width * view.dpr);
     canvas.height = Math.round(view.height * view.dpr);
     ctx.setTransform(view.dpr, 0, 0, view.dpr, 0, 0);
-    boardLayer = null;
+    definirBoardLayer(null);
     // Hexágono máximo que cabe na área livre (limites do mapa em unidades de R). Abaixo de hexRadiusMin, o mapa
     // não encolhe mais: fica maior que a área livre e pode ser arrastado (view.panMaxX/Y > 0).
     const b = limitesMapa(), wU = b.maxX - b.minX, hU = b.maxY - b.minY;
@@ -99,23 +103,31 @@ function limitesMapa() {
 }
 
 // Desloca o mapa (px), dentro dos limites; (0, 0) só reaplica os limites.
-function moverMapa(dx, dy) {
+export function moverMapa(dx, dy) {
     const lim = (v, m) => Math.max(-m, Math.min(m, v));
     const x = lim(view.panX + dx, view.panMaxX), y = lim(view.panY + dy, view.panMaxY);
     const mudou = x !== view.panX || y !== view.panY;
     view.panX = x; view.panY = y;
     view.originX = view.baseX + x;
     view.originY = view.baseY + y;
-    if (mudou) boardLayer = null;
+    if (mudou) definirBoardLayer(null);
     return mudou;
 }
-const mapaArrastavel = () => view.panMaxX > 0 || view.panMaxY > 0;
+export const mapaArrastavel = () => view.panMaxX > 0 || view.panMaxY > 0;
 
 // Troca o mapa ativo (regras + tela). centralizar: volta o deslocamento ao centro.
-function aplicarMapa(id, centralizar = false) {
+export function aplicarMapa(id, centralizar = false) {
     const antes = Rules.mapa;
     Rules.usarMapa(id);
     if (centralizar || antes !== Rules.mapa) { view.panX = view.panY = 0; resizeCanvas(); }
 }
+
+// Executado uma vez na inicialização do jogo (main.js), na ordem certa em relação aos outros módulos.
+export function iniciarTela() {
+document.addEventListener('fullscreenchange', () => TelaCheia.atualizarBotoes());
+document.addEventListener('webkitfullscreenchange', () => TelaCheia.atualizarBotoes());
+$('btn-tela-cheia').addEventListener('click', () => TelaCheia.alternar());
+$('btn-girar').addEventListener('click', () => TelaCheia.entrar());
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
+}

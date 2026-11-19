@@ -1,6 +1,9 @@
 // ── Resumos de 1 linha das habilidades (cartão da Estrela, seleção e caixa da habilidade) ──
 // {F} / {M} = Poder Físico / Mágico atual da Estrela; {F+2}, {M-1}… aplicam o ajuste. O texto completo continua em `descricao`.
-const RESUMOS = {
+import { Rules } from '../motor/regras.js';
+import { COR, esc } from './icones.js';
+
+export const RESUMOS = {
     diamante_reflexo: 'Ao sofrer dano, causa 1 de dano a um adjacente à escolha.',
     diamante_punho: 'Ataca um inimigo adjacente: dano {F}.',
     diamante_soco_chao: 'Dano {M} em todos ao redor e −1 de Agilidade neles.',
@@ -74,7 +77,7 @@ const RESUMOS = {
     angela_expiacao: 'Ataca um inimigo adjacente: dano {F}.',
     angela_consagracao: 'Sofre 1 de dano: +1 nas rolagens de ataque por 2 turnos.'
 };
-function resumoHab(piece, a) {
+export function resumoHab(piece, a) {
     const t = a && RESUMOS[a.id];
     if (!t) return '';
     return esc(t).replace(/\{([FM])([+-]\d+)?\}/g, (_, k, d) => {

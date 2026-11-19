@@ -1,8 +1,18 @@
-function selectedPiece() {
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import { state } from '../partida/estado.js';
+import { resolveChoice, useAbility } from '../partida/acoes.js';
+import { ui } from './ui.js';
+import { COR } from './icones.js';
+import { refreshHUD, updateActionBar } from '../hud/hud.js';
+import { updateStatsPanel } from '../hud/cartoes.js';
+
+export function selectedPiece() {
     return state && ui.selectedId != null ? state.pieces.find(p => p.id === ui.selectedId) : null;
 }
 
-function selectPiece(piece) {
+export function selectPiece(piece) {
     ui.selectedId = piece.id;
     ui.mode = null;
     ui.path = [{ q: piece.q, r: piece.r }];
@@ -11,7 +21,7 @@ function selectPiece(piece) {
     updateActionBar();
 }
 
-function clearSelection(keepPanel = false) {
+export function clearSelection(keepPanel = false) {
     ui.selectedId = null;
     ui.mode = null;
     ui.path = [];
@@ -23,7 +33,7 @@ function clearSelection(keepPanel = false) {
     updateActionBar();
 }
 
-function startAbilityMode(abilityId) {
+export function startAbilityMode(abilityId) {
     const piece = selectedPiece();
     const a = Engine.def(abilityId);
     if (!piece || !a || !Rules.canSelect(state, piece) || !Engine.canUse(state, piece, a)) return;
@@ -32,7 +42,7 @@ function startAbilityMode(abilityId) {
 }
 
 // Custo alternativo: alterna entre pagar com Âmago e com o recurso (quando os dois são possíveis).
-function trocarPagamento(modo = null) {
+export function trocarPagamento(modo = null) {
     const piece = selectedPiece();
     const a = ui.mode && Engine.def(ui.mode.abilityId);
     if (!piece || !a) return;
@@ -43,20 +53,20 @@ function trocarPagamento(modo = null) {
 }
 
 // Custo da habilidade em HTML: ◆Âmago, + recurso adicional ou "/ recurso" alternativo.
-function custoHTML(piece, a, car = null) {
+export function custoHTML(piece, a, car = null) {
     const c = car || Engine.caracteristicas(piece, a);
     const rec = (x, sep) => { const r = CONFIG.recursos[x.recurso] || {}; return ` <span style="color:${r.cor}">${sep}${r.icone || ''}${x.valor}</span>`; };
     const repete = a.repeteCom && state && piece.turn && (piece.turn.usos[a.id] || 0) > 0 && Engine.slot(state, piece, a) === 'repeticao'; // Disparo Arcano repetido
     return `<span style="color:${COR.amago}">◆${c.custo}</span>${a.custoAdicional ? rec(a.custoAdicional, '+') : ''}${repete ? rec(a.repeteCom, '+') : ''}${a.custoAlternativo ? rec(a.custoAlternativo, '/ ') : ''}`;
 }
 
-function cancelAbilityMode() {
+export function cancelAbilityMode() {
     if (ui.mode && ui.mode.etapa) ui.mode.etapa = null;
     else ui.mode = null;
     refreshHUD();
 }
 
-function handleTargetClick(hex) {
+export function handleTargetClick(hex) {
     if (!state || state.winner) return false;
     if (state.pending) {
         if (state.pending.tipo === 'escolha') {

@@ -1,10 +1,23 @@
+import { $ } from '../nucleo/dom.js';
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import { state } from '../partida/estado.js';
+import { Tutorial } from '../menus/tutorial.js';
+import { ui } from '../interface/ui.js';
+import { COR, esc, iconeHTML, icRenome } from '../interface/icones.js';
+import { resumoHab } from '../interface/resumos.js';
+import { estrelaBg, retratoSrc } from '../menus/escolha-equipe.js';
+import { ehCompacto, HUD } from '../render/tela.js';
+import { motivoIndisponivel, situacaoHabilidade } from './hud.js';
+
 // Cor da vida pela fração restante (verde → amarelo → vermelho).
-const corVida = (f) => f > 0.5 ? COR.vida : f > 0.25 ? '#facc15' : '#ef4444';
+export const corVida = (f) => f > 0.5 ? COR.vida : f > 0.25 ? '#facc15' : '#ef4444';
 
 const NOME_ATRIB = { agilidade: 'Agilidade', fisico: 'Físico', magico: 'Mágico' };
 const LEGENDA_STAT = { amago: 'energia das habilidades', armadura: 'absorve o dano' };
 const ROTULO_TIPO = { ataque: 'ATAQUE', instantanea: 'INSTANTÂNEA', reacao: 'REAÇÃO', passiva: 'PASSIVA' };
-const tagTipoHTML = (a, car = {}) => `<span class="hab-tag tag-${a.tipo}">${ROTULO_TIPO[a.tipo] || esc(a.tipo)}</span>${car.ultraRapida ? '<span class="hab-tag tag-ultra">ULTRA RÁPIDA</span>' : ''}`;
+export const tagTipoHTML = (a, car = {}) => `<span class="hab-tag tag-${a.tipo}">${ROTULO_TIPO[a.tipo] || esc(a.tipo)}</span>${car.ultraRapida ? '<span class="hab-tag tag-ultra">ULTRA RÁPIDA</span>' : ''}`;
 const pontosHTML = (n, cheios, cls = '') => Array.from({ length: n }, (_, i) => `<i class="${i < cheios ? 'on' : ''} ${cls}"></i>`).join('');
 
 // Barra de Vida/Âmago: dividida em pontos (dá para contar de olho); máximos grandes usam a barra contínua.
@@ -114,7 +127,7 @@ function fillPiecePanel(prefix, piece) {
     if (list._html !== html) { list.innerHTML = html; list._html = html; } // só reescreve o DOM se mudou
 }
 
-function updateStatsPanel(piece) {
+export function updateStatsPanel(piece) {
     const panel = $('stats-panel');
     if (!piece) {
         panel.classList.add('hidden');
@@ -138,14 +151,14 @@ function updateStatsPanel(piece) {
 }
 
 // Inspeção: Estrela sob o cursor (ou fixada com clique) — inclusive oponentes —, ao lado do painel da Estrela selecionada.
-function inspectedPiece() {
+export function inspectedPiece() {
     if (!state) return null;
     const id = ui.hoverId ?? ui.pinId;
     const p = id != null && id !== ui.selectedId ? Rules.pieceById(state, id) : null;
     return p && Engine.isAlive(p) ? p : null;
 }
 
-function updateInspectPanel() {
+export function updateInspectPanel() {
     const panel = $('inspect-panel');
     const piece = inspectedPiece();
     const ini = $('initiative-bar');
@@ -212,7 +225,7 @@ function updateInspectPanel() {
     panel.classList.remove('hidden');
 }
 
-function setHover(id, daOrdem = false) {
+export function setHover(id, daOrdem = false) {
     const origem = id != null && daOrdem; // passou o mouse na ordem dos turnos (o cartão não pode cobri-la)
     if (ui.hoverId === id && ui.hoverDaOrdem === origem) return;
     ui.hoverDaOrdem = origem;

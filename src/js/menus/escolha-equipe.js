@@ -1,7 +1,23 @@
-let currentSelectingPlayer = 1;
-let selectedColorsForMenu = [];
+import { $ } from '../nucleo/dom.js';
+import { CONFIG } from '../motor/config.js';
+import { RETRATOS } from '../estrelas/estrelas.js';
+import { Rules } from '../motor/regras.js';
+import { Engine } from '../motor/engine.js';
+import { teams } from '../partida/estado.js';
+import { Bot } from '../bot/bot.js';
+import { Rede } from '../online/rede.js';
+import { botsDoModo, jogadoresDoModo, modoAtual } from '../partida/partida.js';
+import { esc } from '../interface/icones.js';
+import { resumoHab, RESUMOS } from '../interface/resumos.js';
+import { ehCompacto, ehToque } from '../render/tela.js';
+import { tagTipoHTML } from '../hud/cartoes.js';
 
-function renderSelectionTitle() {
+export let currentSelectingPlayer = 1;
+export function definirCurrentSelectingPlayer(valor) { currentSelectingPlayer = valor; return valor; } // para outros módulos trocarem "currentSelectingPlayer"
+export let selectedColorsForMenu = [];
+export function definirSelectedColorsForMenu(valor) { selectedColorsForMenu = valor; return valor; } // para outros módulos trocarem "selectedColorsForMenu"
+
+export function renderSelectionTitle() {
     const title = $('selection-title');
     Bot.rotulos(modoAtual());
     const md = CONFIG.modos[modoAtual()], doBot = !Rede.ativo() && botsDoModo(modoAtual()).includes(currentSelectingPlayer);
@@ -15,9 +31,9 @@ function renderSelectionTitle() {
 }
 
 // Estrela de exemplo (fora de partida) para ler habilidades/características.
-const estrelaExemplo = (color) => Rules.createPieces([color], [])[0];
+export const estrelaExemplo = (color) => Rules.createPieces([color], [])[0];
 
-function chipsStatus(base, piece = null) {
+export function chipsStatus(base, piece = null) {
     return CONFIG.statFields.map(f => `<span class="px-2 py-0.5 rounded-md bg-gray-900/80 border border-gray-700 whitespace-nowrap" title="${esc(f.desc)}"><span class="text-gray-400 text-[10px]">${f.curto}</span> <b style="color:${f.cor}">${base[f.key]}</b></span>`).join('');
 }
 
@@ -51,11 +67,11 @@ function mostrarInfoEstrela(color) {
 }
 
 // Retrato (data URL) da Estrela, ou null se não houver.
-const retratoSrc = nome => (typeof RETRATOS !== 'undefined' && RETRATOS[nome]) || null;
+export const retratoSrc = nome => RETRATOS[nome] || null;
 
 // Retrato carregado (Image) da Estrela, ou null enquanto não houver/carregar.
 const retratoCache = {};
-function retrato(nome) {
+export function retrato(nome) {
     const src = retratoSrc(nome);
     if (!src) return null;
     let img = retratoCache[nome];
@@ -64,7 +80,7 @@ function retrato(nome) {
 }
 
 // Fundo de um círculo do menu/painel: retrato (se houver) sobre a cor da Estrela.
-function estrelaBg(el, nome, color) {
+export function estrelaBg(el, nome, color) {
     if (el._bg === nome + color) return; // o retrato é uma string grande: só reaplica quando muda
     el._bg = nome + color;
     el.style.backgroundColor = color;
@@ -79,11 +95,11 @@ function estrelaNomeLabel(nome) {
 }
 
 // Cores das Estrelas ordenadas pelo nome (seleção e glossário).
-function estrelasEmOrdem() {
+export function estrelasEmOrdem() {
     return Object.keys(CONFIG.estrelas).sort((a, b) => CONFIG.estrelas[a].nome.localeCompare(CONFIG.estrelas[b].nome, 'pt-BR', { sensitivity: 'base' }));
 }
 
-function buildColorButtons() {
+export function buildColorButtons() {
     const box = $('color-options');
     box.innerHTML = '';
     estrelasEmOrdem().forEach(color => {
@@ -103,7 +119,7 @@ function buildColorButtons() {
 }
 
 // "Sortear": escolhe Estrelas ao acaso para a equipe que está sendo montada (útil para as equipes dos Bots).
-function sortearEquipe() {
+export function sortearEquipe() {
     if (Rede.ativo() && teams[Rede.eu].length) return; // online: equipe já confirmada
     const todas = estrelasEmOrdem().slice();
     for (let i = todas.length - 1; i > 0; i--) { const k = Math.floor(Math.random() * (i + 1)); [todas[i], todas[k]] = [todas[k], todas[i]]; }
@@ -119,7 +135,7 @@ function toggleColor(color) {
     updateSelectionUI();
 }
 
-function updateSelectionUI() {
+export function updateSelectionUI() {
     const slots = $('selected-slots');
     slots.innerHTML = '';
     for (let i = 0; i < CONFIG.teamSize; i++) {

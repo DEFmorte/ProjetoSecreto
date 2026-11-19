@@ -1,10 +1,26 @@
+import { CONFIG } from '../motor/config.js';
+import { Engine } from '../motor/engine.js';
+import { definirState, definirUndoStack, state } from './estado.js';
+import { Tutorial } from '../menus/tutorial.js';
+import { Bot } from '../bot/bot.js';
+import { Rede } from '../online/rede.js';
+import { newState, snapshot } from './partida.js';
+import { afterStateChange } from './acoes.js';
+import { ui } from '../interface/ui.js';
+import { canvas } from '../render/canvas.js';
+import { aplicarMapa } from '../render/tela.js';
+import { pixelToHex } from '../render/hex.js';
+import { definirGameRunning, gameRunning, startLoop } from './loop.js';
+import { VFX } from '../render/vfx.js';
+import { fecharPausa } from '../menus/pausa.js';
+
 // estadoJson: estado inicial vindo do anfitrião (convidado online).
 // desfazer: pilha de desfazer restaurada (Continuar partida).
 // ── Sorteio da ordem dos turnos ──
 // Ao criar a partida (newState), a ordem de todos os jogadores é sorteada (state.ordem) e vale a partida toda.
 // Esta tela mostra o resultado com uma animação curta antes da 1ª jogada; o Bot espera ela fechar.
 // Online, cada aparelho mostra a mesma ordem (vem no estado do anfitrião) e a tela fecha sozinha após alguns segundos.
-const Sorteio = {
+export const Sorteio = {
     el: null, timers: [], girando: false, ordem: [],
     tempo: { giroMin: 55, giroMax: 190, porVaga: 1000, online: 6 }, // ms; online: segundos até fechar sozinha
     sortear(lista) { // embaralha (Fisher–Yates)
@@ -101,14 +117,14 @@ const Sorteio = {
     }
 };
 
-function beginMatch(estadoJson = null, desfazer = null) {
+export function beginMatch(estadoJson = null, desfazer = null) {
     ui.pinId = ui.hoverId = null; // ids se repetem entre partidas
-    undoStack = Array.isArray(desfazer) ? [...desfazer] : [];
-    state = typeof estadoJson === 'string' ? JSON.parse(estadoJson) : newState();
+    definirUndoStack(Array.isArray(desfazer) ? [...desfazer] : []);
+    definirState(typeof estadoJson === 'string' ? JSON.parse(estadoJson) : newState());
     if (!Array.isArray(state.fx)) state.fx = []; // partidas salvas antes dos efeitos visuais
     aplicarMapa(state.mapa || 'classico', true);
     Bot.prepararPartida();
-    gameRunning = true;
+    definirGameRunning(true);
     ui.vis = null; ui.floats = []; ui.anims = {}; ui.vitoriaVista = null; VFX.limpar();
     fecharPausa();
     afterStateChange();
@@ -120,7 +136,7 @@ function beginMatch(estadoJson = null, desfazer = null) {
     Rede.atualizarStatus();
 }
 
-function eventHex(e) {
+export function eventHex(e) {
     const rect = canvas.getBoundingClientRect();
     return pixelToHex(e.clientX - rect.left, e.clientY - rect.top);
 }

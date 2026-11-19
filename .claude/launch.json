@@ -3,14 +3,14 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["ferramentas/servidor.mjs"],
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite"],
       "port": 8080
     },
     {
       "name": "preview",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["ferramentas/servidor.mjs", "--dist"],
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "preview"],
       "port": 8090
     }
   ]

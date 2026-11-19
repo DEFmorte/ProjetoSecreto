@@ -2,27 +2,19 @@
 // O Bot pensa numa cópia do motor (CONFIG, Rules, Engine e o próprio Bot) que roda em paralelo (worker.js): a tela
 // continua fluida enquanto ele calcula. Se o navegador não deixar criar o Worker, ou ele falhar, o Bot volta a pensar
 // na própria página (como antes, com pequenas pausas na animação).
-const BotWorker = {
-    w: null, url: null, falhou: false, seq: 0, espera: null, timer: null,
+// O "?worker&inline" é do Vite: empacota o worker.js (com motor, Estrelas e IA) e embute no código do jogo.
+import WorkerDoBot from './worker.js?worker&inline';
+
+export const BotWorker = {
+    w: null, falhou: false, seq: 0, espera: null, timer: null,
     limiteMs: 15000, // sem resposta nesse tempo: desiste do Worker
-    // Endereço do Worker. Em desenvolvimento, é o arquivo js/bot/worker.js. No build (arquivo único), o worker.js vem
-    // embutido como texto (<script type="text/plain" id="fonte-bot-worker">) e o lugar do importScripts (/*@motor@*/)
-    // recebe o código dos scripts do motor desta página (marcados com data-worker).
-    endereco() {
-        const embutido = document.getElementById('fonte-bot-worker');
-        if (!embutido) return 'js/bot/worker.js';
-        const motor = [...document.querySelectorAll('script[data-worker]')].map(s => s.textContent).join('\n');
-        const src = embutido.textContent.replace('/*@motor@*/', () => motor);
-        return URL.createObjectURL(new Blob([src], { type: 'text/javascript' }));
-    },
     // Cria o Worker na primeira vez (true = disponível).
     iniciar() {
         if (this.w) return true;
         if (this.falhou) return false;
         try {
             if (typeof Worker !== 'function' || typeof Blob !== 'function') throw new Error('navegador sem Worker');
-            if (!this.url) this.url = this.endereco();
-            this.w = new Worker(this.url);
+            this.w = new WorkerDoBot();
             this.w.onmessage = (e) => this.resposta(e.data);
             this.w.onerror = (e) => { if (e && e.preventDefault) e.preventDefault(); this.desistir(e && e.message || 'erro no Worker'); };
         } catch (e) { this.desistir(e && e.message || e); }

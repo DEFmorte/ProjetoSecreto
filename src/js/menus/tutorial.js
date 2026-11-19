@@ -1,6 +1,18 @@
 // ── Partida guiada (tutorial opcional, aberto em Como jogar) ──
 // Uma partida local normal (2 jogadores, equipes prontas) com um guia passo a passo; não é salva em "Continuar partida".
-const Tutorial = {
+import { $ } from '../nucleo/dom.js';
+import { CONFIG } from '../motor/config.js';
+import { Rules } from '../motor/regras.js';
+import { definirModoEscolhido, definirTeams, equipesVazias, state, teams } from '../partida/estado.js';
+import { Rede } from '../online/rede.js';
+import { ui } from '../interface/ui.js';
+import { selectedPiece } from '../interface/selecao.js';
+import { ehCompacto, ehToque, HUD } from '../render/tela.js';
+import { inspectedPiece, updateInspectPanel } from '../hud/cartoes.js';
+import { startGame } from '../partida/loop.js';
+import { fecharAjuda } from './ajuda.js';
+
+export const Tutorial = {
     partida: false, // a partida atual é a guiada (não salva)
     ativo: false,   // o guia está na tela
     passo: 0, base: null, notaAtual: null, notasVistas: {},
@@ -45,8 +57,8 @@ const Tutorial = {
         if (Rede.ativo()) return;
         const C = CONFIG.estrelas, cor = n => Object.keys(C).find(k => C[k].nome === n);
         fecharAjuda(false);
-        modoEscolhido = 'bot';
-        teams = equipesVazias();
+        definirModoEscolhido('bot');
+        definirTeams(equipesVazias());
         for (const j of [1, 2]) teams[j] = this.equipes[j].map(cor).filter(Boolean);
         Object.assign(this, { partida: true, ativo: true, passo: 0, base: null, notaAtual: null, notasVistas: {} });
         startGame();
@@ -120,8 +132,12 @@ const Tutorial = {
         } finally { this.verificando = false; }
     }
 };
+
+// Executado uma vez na inicialização do jogo (main.js), na ordem certa em relação aos outros módulos.
+export function iniciarTutorial() {
 $('tut-proximo').addEventListener('click', () => Tutorial.avancar());
 $('tut-fechar').addEventListener('click', () => Tutorial.fechar());
 $('tut-min').addEventListener('click', () => Tutorial.encolher(!$('tutorial').classList.contains('tut-min')));
 window.addEventListener('resize', () => { if (Tutorial.ativo) Tutorial.posicionar(); });
 $('btn-tutorial').addEventListener('click', () => Tutorial.iniciar());
+}
