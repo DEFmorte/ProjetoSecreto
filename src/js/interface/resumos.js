@@ -1,5 +1,6 @@
 // ── Resumos de 1 linha das habilidades (cartão da Estrela, seleção e caixa da habilidade) ──
-// {F} / {M} = Poder Físico / Mágico atual da Estrela; {F+2}, {M-1}… aplicam o ajuste. O texto completo continua em `descricao`.
+// {F} / {M} = Poder Físico / Mágico atual da Estrela; {F+2}, {M-1}… aplicam o ajuste. O texto completo continua em
+// `descricao`.
 import { Rules } from '../motor/regras.js';
 import { COR, esc } from './icones.js';
 
@@ -75,7 +76,7 @@ export const RESUMOS = {
     angela_penitente: 'Ganha Penitência ao sofrer dano (máx. 3). Ao acertar: +1 de dano por marcador gasto.',
     angela_retribuicao: 'Reação: inimigo adjacente errou o ataque nela → contra-ataca: dano {F}.',
     angela_expiacao: 'Ataca um inimigo adjacente: dano {F}.',
-    angela_consagracao: 'Sofre 1 de dano: +1 nas rolagens de ataque por 2 turnos.'
+    angela_consagracao: 'Sofre 1 de dano: +1 nas rolagens de ataque por 2 turnos.',
 };
 export function resumoHab(piece, a) {
     const t = a && RESUMOS[a.id];

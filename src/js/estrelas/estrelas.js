@@ -11,12 +11,12 @@
 // Engine.validarConfig() avisa no console se uma habilidade da ficha não existir.
 import { CONFIG } from '../motor/config.js';
 
-
 // Retrato de cada Estrela, pelo nome (usado pela interface).
 export const RETRATOS = {};
 
 export function definirEstrela({ cor, retrato = null, ficha, habilidades = {} }) {
-    if (CONFIG.estrelas[cor]) throw new Error(`Estrela repetida: ${cor} (${ficha.nome} e ${CONFIG.estrelas[cor].nome})`);
+    if (CONFIG.estrelas[cor])
+        throw new Error(`Estrela repetida: ${cor} (${ficha.nome} e ${CONFIG.estrelas[cor].nome})`);
     CONFIG.estrelas[cor] = ficha;
     for (const [id, def] of Object.entries(habilidades)) {
         if (CONFIG.abilities[id]) throw new Error(`Habilidade repetida: ${id} (${ficha.nome})`);

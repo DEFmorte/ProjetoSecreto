@@ -8,8 +8,8 @@ import { ui } from '../interface/ui.js';
 import { COR, esc, iconeHTML, ICONES, icRenome } from '../interface/icones.js';
 import { descricaoComTermos, GLOSSARIO, GLOSSARIO_ORDEM, GLOSSARIO_SECOES } from '../interface/glossario.js';
 import { chipsStatus, estrelaExemplo, estrelasEmOrdem, retratoSrc } from './escolha-equipe.js';
-import { setPreview } from '../hud/hud.js';
 import { abrirPausa, fecharPausa } from './pausa.js';
+import { setPreview } from '../hud/habilidades.js';
 
 let ajudaVolta = null; // null = menu principal, 'pausa' = volta ao menu de pausa, 'jogo' = volta à partida
 const ABAS_AJUDA = [
@@ -18,15 +18,16 @@ const ABAS_AJUDA = [
     { id: 'combate', nome: 'Combate' },
     { id: 'estrelas', nome: 'Estrelas' },
     { id: 'glossario', nome: 'Glossário' },
-    { id: 'controles', nome: 'Controles' }
+    { id: 'controles', nome: 'Controles' },
 ];
 
 export function mostrarAjuda(aba = ui.abaAjuda, volta = null) {
     ajudaVolta = volta;
     if (volta === 'pausa') fecharPausa();
     setPreview(null);
-    ui.abaAjuda = ABAS_AJUDA.some(t => t.id === aba) ? aba : 'objetivo';
-    $('tutorial-box').classList.toggle('hidden', volta !== null || Rede.ativo()); // só pelo menu principal (não abandona partida)
+    ui.abaAjuda = ABAS_AJUDA.some((t) => t.id === aba) ? aba : 'objetivo';
+    // só pelo menu principal (não abandona partida)
+    $('tutorial-box').classList.toggle('hidden', volta !== null || Rede.ativo());
     renderAjuda();
     const tela = $('help-screen');
     tela.classList.remove('hidden');
@@ -44,7 +45,7 @@ export function fecharAjuda(voltar = true) {
 }
 
 export function trocarAbaAjuda(passo) {
-    const i = ABAS_AJUDA.findIndex(t => t.id === ui.abaAjuda);
+    const i = ABAS_AJUDA.findIndex((t) => t.id === ui.abaAjuda);
     ui.abaAjuda = ABAS_AJUDA[(i + passo + ABAS_AJUDA.length) % ABAS_AJUDA.length].id;
     renderAjuda();
     $('help-screen').scrollTop = 0;
@@ -53,26 +54,34 @@ export function trocarAbaAjuda(passo) {
 function renderAjuda() {
     const tabs = $('help-tabs');
     tabs.innerHTML = '';
-    ABAS_AJUDA.forEach(t => {
+    ABAS_AJUDA.forEach((t) => {
         const b = document.createElement('button');
         b.className = `tab-btn ${t.id === ui.abaAjuda ? 'ativa' : ''}`;
         b.innerText = t.nome;
-        b.addEventListener('click', () => { ui.abaAjuda = t.id; renderAjuda(); });
+        b.addEventListener('click', () => {
+            ui.abaAjuda = t.id;
+            renderAjuda();
+        });
         tabs.appendChild(b);
     });
     $('help-content').innerHTML = conteudoAjuda(ui.abaAjuda);
 }
 
 function conteudoAjuda(aba) {
-    const R = CONFIG.rules, ren = CONFIG.renome, atk = R.attackRoll;
-    const dado = d => `${d.count}D${d.sides}`;
-    const statDe = k => CONFIG.statFields.find(f => f.key === k) || { label: k, cor: '#fff' };
-    const st = k => `<b style="color:${statDe(k).cor}">${statDe(k).label.charAt(0) + statDe(k).label.slice(1).toLowerCase()}</b>`;
+    const R = CONFIG.rules,
+        ren = CONFIG.renome,
+        atk = R.attackRoll;
+    const dado = (d) => `${d.count}D${d.sides}`;
+    const statDe = (k) => CONFIG.statFields.find((f) => f.key === k) || { label: k, cor: '#fff' };
+    const st = (k) =>
+        `<b style="color:${statDe(k).cor}">${statDe(k).label.charAt(0) + statDe(k).label.slice(1).toLowerCase()}</b>`;
     const star = `<b style="color:${ren.cor}">${icRenome()} Renome</b>`;
-    const termo = (t, d, cor) => `<div class="termo"><b${cor ? ` style="color:${cor}"` : ''}>${t}</b><span>${d}</span></div>`;
-    const kbd = k => `<span class="kbd">${k}</span>`;
+    const termo = (t, d, cor) =>
+        `<div class="termo"><b${cor ? ` style="color:${cor}"` : ''}>${t}</b><span>${d}</span></div>`;
+    const kbd = (k) => `<span class="kbd">${k}</span>`;
     const L = CONFIG.habilidades;
-    if (aba === 'objetivo') return `
+    if (aba === 'objetivo')
+        return `
         <h3>Objetivo</h3>
         <p>Dois ou três jogadores (todos contra todos), cada um com uma equipe de <b>${CONFIG.teamSize} Estrelas</b>, se enfrentam num tabuleiro de zonas hexagonais. Vence quem primeiro:</p>
         <ul>${Rules.textoMetaRenome() ? `<li>somar <b style="color:${ren.cor}">${icRenome()} ${Rules.textoMetaRenome()} de Renome</b> no time (a soma do que as Estrelas carregam), ou</li>` : ''}
@@ -87,7 +96,8 @@ function conteudoAjuda(aba) {
         <ol class="list-decimal pl-5"><li>Cada jogador escolhe ${CONFIG.teamSize} Estrelas (passe o mouse para ver os atributos).</li>
             <li>Na sua vez, mova e use uma habilidade com cada Estrela.</li>
             <li>Na dúvida, passe o mouse sobre Estrelas e habilidades: a ficha e o alcance aparecem na tela.</li></ol>`;
-    if (aba === 'turno') return `
+    if (aba === 'turno')
+        return `
         <h3>Ordem</h3>
         <p>${R.turnMode === 'initiative' ? `As Estrelas agem em blocos por ordem de ${st(R.initiative.stat)} (a barra no topo mostra a ordem).` : 'Os jogadores alternam turnos, numa ordem <b>sorteada no início</b> da partida (vale a partida toda). No seu turno, cada Estrela do time age uma vez, na ordem que você quiser.'}</p>
         <h3 class="mt-4">Início do turno do jogador</h3>
@@ -102,7 +112,8 @@ function conteudoAjuda(aba) {
             <li>Errou? <b>Desfazer</b> ${kbd('Ctrl+Z')} volta qualquer ação, inclusive rolagens (só contra Bots).</li>
             <li><b>Contra Bots:</b> em <b>Jogar contra Bots</b>, escolha <b>Contra 1 Bot</b> (um contra um) ou <b>Contra 2 Bots</b> (três equipes, todos contra todos). Você monta a sua equipe e a de cada Bot (ou usa <b>🎲 Sortear</b>); eles jogam sozinhos na vez deles (e decidem as próprias reações). Abaixo dos modos, escolha o <b>nível</b>: <b>Normal</b> (às vezes escolhe uma jogada pior) ou <b>Difícil</b> (pensa um pouco mais e prevê a sua resposta antes de agir). As rolagens são automáticas e <b>Desfazer</b> volta à sua última decisão.</li>
             <li><b>Online:</b> em <b>Jogar online</b>, um jogador cria a sala e envia o código; o outro entra com ele. Cada um controla só a própria equipe, as rolagens são automáticas e não há desfazer.</li></ul>`;
-    if (aba === 'combate') return `
+    if (aba === 'combate')
+        return `
         <h3>Tipos de habilidade</h3>
         ${termo(L.primarias.ataque.label, `Exige rolagem: o atacante rola <b>${dado(atk.attackerDice)}</b>, o defensor rola <b>${dado(atk.defenderDice)}</b>${atk.defenderAddsStat ? ` + ${st(atk.defenderAddsStat)}` : ''}. Acerta se o total do atacante for <b>maior</b>; empate = esquiva.`)}
         ${termo(L.primarias.instantanea.label, 'Funciona direto, sem rolagem.')}
@@ -117,21 +128,44 @@ function conteudoAjuda(aba) {
             <li>Passe o mouse numa habilidade: zonas claras = alcance; zonas pulsando = alvos válidos (<b class="text-orange-400">laranja</b> inimigos, <b class="text-green-400">verde</b> aliados).</li></ul>
         <h3 class="mt-4">Efeitos</h3>
         <ul><li><b class="text-green-400">▲</b> bônus e <b class="text-red-400">▼</b> penalidade ativos na Estrela (detalhes na ficha).</li>
-            ${Object.values(CONFIG.marks).map(m => `<li><b style="color:${m.cor}">${m.icone && ICONES[m.icone] ? iconeHTML(m.icone) : '◆ ' + m.sigla}</b> — ${m.nome}: ${m.unica ? 'uma por vez' : 'marca empilhável'}${m.debuff ? ' (conta como debuff)' : ''}.</li>`).join('')}</ul>`;
-    if (aba === 'estrelas') return `<div class="grid md:grid-cols-2 gap-3">${estrelasEmOrdem().map(color => [color, CONFIG.estrelas[color]]).map(([color, h]) => {
-        const p = estrelaExemplo(color), src = retratoSrc(h.nome);
-        return `<div class="rounded-2xl border border-gray-700 bg-gray-800/40 p-3">
+            ${Object.values(CONFIG.marks)
+                .map(
+                    (m) =>
+                        `<li><b style="color:${m.cor}">${m.icone && ICONES[m.icone] ? iconeHTML(m.icone) : '◆ ' + m.sigla}</b> — ${m.nome}: ${m.unica ? 'uma por vez' : 'marca empilhável'}${m.debuff ? ' (conta como debuff)' : ''}.</li>`,
+                )
+                .join('')}</ul>`;
+    if (aba === 'estrelas')
+        return `<div class="grid md:grid-cols-2 gap-3">${estrelasEmOrdem()
+            .map((color) => [color, CONFIG.estrelas[color]])
+            .map(([color, h]) => {
+                const p = estrelaExemplo(color),
+                    src = retratoSrc(h.nome);
+                return `<div class="rounded-2xl border border-gray-700 bg-gray-800/40 p-3">
             <div class="flex items-center gap-3 mb-2"><span class="w-10 h-10 rounded-full shrink-0 border-2 border-gray-900" style="background:${color}${src ? ` url('${src}') center/cover` : ''}"></span>
                 <b class="text-base" style="color:${color}">${h.nome}</b></div>
             <div class="flex flex-wrap gap-1 mb-2 text-xs">${chipsStatus(h)}</div>
-            ${Engine.abilitiesOf(p).map(a => `<div class="mt-2 text-xs"><b>${a.nome}</b> <span class="text-gray-500">· ${Engine.descreverCaracteristicas(p, a)}</span>
-                <div class="text-gray-400 leading-snug whitespace-pre-line">${descricaoComTermos(a.descricao)}</div></div>`).join('')}
-        </div>`; }).join('')}</div>`;
-    if (aba === 'glossario') return GLOSSARIO_ORDEM.map((secao, i) => `
+            ${Engine.abilitiesOf(p)
+                .map(
+                    (
+                        a,
+                    ) => `<div class="mt-2 text-xs"><b>${a.nome}</b> <span class="text-gray-500">· ${Engine.descreverCaracteristicas(p, a)}</span>
+                <div class="text-gray-400 leading-snug whitespace-pre-line">${descricaoComTermos(a.descricao)}</div></div>`,
+                )
+                .join('')}
+        </div>`;
+            })
+            .join('')}</div>`;
+    if (aba === 'glossario')
+        return GLOSSARIO_ORDEM.map(
+            (secao, i) => `
         <h3${i ? ' class="mt-4"' : ''}>${secao}</h3>
         ${GLOSSARIO_SECOES[secao] ? `<p class="text-gray-300 leading-snug mb-2">${GLOSSARIO_SECOES[secao]}</p>` : ''}
-        ${GLOSSARIO.filter(g => g.secao === secao).map(g => termo((g.icone ? iconeHTML(g.icone) + ' ' : '') + esc(g.nome), g.desc, g.cor)).join('')}`).join('');
-    if (aba === 'controles') return `
+        ${GLOSSARIO.filter((g) => g.secao === secao)
+            .map((g) => termo((g.icone ? iconeHTML(g.icone) + ' ' : '') + esc(g.nome), g.desc, g.cor))
+            .join('')}`,
+        ).join('');
+    if (aba === 'controles')
+        return `
         <h3>Toque (celular)</h3>
         <ul><li>O jogo fica <b>na horizontal</b>; no Android, use o botão <b>Tela cheia</b> no menu principal ou na pausa (o mesmo botão sai dela).</li>
             <li><b>Toque</b> numa Estrela com anel para selecionar; numa Estrela que não pode agir, fixa a ficha dela (toque de novo para soltar).</li>

@@ -8,6 +8,7 @@ Textos, nomes e comentários do código em português.
 - `npm run dev` — Vite em http://localhost:8080 (recarrega sozinho). `npm run dev:rede` expõe na rede local (celular).
 - `npm run build` — gera `dist/PlayZinordia_<versão>.html`, arquivo único e offline (tudo embutido). `npm run preview` serve `dist/`
   (abra `/PlayZinordia_<versão>.html`).
+- `npm run lint` (ESLint) e `npm run formatar` (Prettier). `npm run checar` = lint + conferência de formatação.
 - A versão fica em `package.json` (`version`) e dá nome ao arquivo do build.
 
 ## Arquitetura
@@ -31,27 +32,37 @@ Textos, nomes e comentários do código em português.
   `'p-' + n`). Estilos próprios vão em `src/css/estilo.css`.
 - **Segurança (CSP) e versão do online:** preenchidas por `ferramentas/vite-jogo.js` (dev aberto, build estrito; o online
   só fala com `0.peerjs.com` e só junta jogadores com a mesma impressão digital do código).
+- **Objetos grandes divididos por assunto:** `Engine`, `Rules`, `VFX` e `Rede` são montados a partir de uma pasta com o
+  mesmo nome (ex.: `motor/engine/*.js`, cada arquivo `export default { métodos }`), juntados com `...` no arquivo de
+  mesmo nome. Use sempre `Engine.x(...)` (nunca importe a parte direto). Método novo: coloque no arquivo do assunto.
+  Não use getters (`get x()`) nessas partes: o `...` copiaria o valor, não o getter.
+- **Estilo:** Prettier (120 colunas, 4 espaços, aspas simples) e ESLint — rode `npm run formatar` antes de commitar
+  (ou ative "formatar ao salvar" no VS Code; `.vscode/` já tem a configuração). Textos longos do jogo (descrições)
+  ficam numa linha só: use a quebra automática de linha do editor.
 - **Depuração:** `window.Game` (em `main.js`) expõe estado e ações no console: `Game.state`, `Game.executar(acao)`,
   `Game.IA.decidir(Game.state)`, `Game.undo()`...
 
 ## Mapa de `src/js`
 
-| Pasta | O que tem |
-|---|---|
-| `main.js` | entrada: chama os `iniciarX()`, liga botões e atalhos de teclado, `window.Game` |
-| `nucleo/` | `$` (getElementById) e `Falha` (tela de erro inesperado; carrega primeiro, não importa nada) |
-| `motor/` | `CONFIG` (mapas, modos, regras gerais), `Rules`, `Engine` — regras puras, sem tela |
-| `estrelas/` | um arquivo por Estrela: ficha, habilidades e retrato (`definirEstrela`, `RETRATOS`) |
-| `bot/` | `IA` (decisão pura, `ia.js`), `Bot` (joga na partida, `bot.js`), `BotWorker` e o Worker |
-| `partida/` | estado (`state`, `undoStack`, `teams`), ações/desfazer, salvamento, loop, sorteio da ordem |
-| `online/` | `Rede` (PeerJS) e menus online |
-| `interface/` | estado da UI (`ui`), ícones, resumos, glossário, seleção de peça/alvo |
-| `hud/` | barras, registro, cartões e painéis da partida |
-| `render/` | canvas, tela/redimensionamento, hexágonos, desenho, VFX, cena (game loop) |
-| `entrada/` | mouse/toque e arrastar o mapa |
-| `menus/` | menu principal, escolha de equipe, pausa, ajuda, tutorial |
+| Pasta           | O que tem                                                                                             |
+| --------------- | ----------------------------------------------------------------------------------------------------- |
+| `main.js`       | entrada: chama os `iniciarX()`, liga botões e atalhos de teclado, `window.Game`                       |
+| `nucleo/`       | `$` (getElementById) e `Falha` (tela de erro inesperado; carrega primeiro, não importa nada)          |
+| `motor/`        | `CONFIG` (mapas, modos, regras gerais); `index.js` = entrada da lógica pura                           |
+| `motor/regras/` | `Rules`: tabuleiro, atributos, movimento, criação das Estrelas, rodadas, vida, Renome                 |
+| `motor/engine/` | `Engine`: habilidades (características, custos, alvos, uso), ataques, reações, efeitos, dano, eventos |
+| `estrelas/`     | um arquivo por Estrela: ficha, habilidades e retrato (`definirEstrela`, `RETRATOS`)                   |
+| `bot/`          | `IA` (decisão pura, `ia.js`), `Bot` (joga na partida, `bot.js`), `BotWorker` e o Worker               |
+| `partida/`      | estado (`state`, `undoStack`, `teams`), ações/desfazer, salvamento, loop, sorteio da ordem            |
+| `online/`       | `Rede` (`rede.js` + `rede/`: conexão, envio, recebimento, segurança...), menus e códigos de sala      |
+| `interface/`    | estado da UI (`ui`), ícones, resumos, glossário, seleção de peça/alvo                                 |
+| `hud/`          | `hud.js` (refreshHUD) + turno, habilidades, avisos, registro, cartões                                 |
+| `render/`       | canvas, tela, hexágonos, desenho, cena (game loop); `VFX` (`vfx.js` + `vfx/`, estilos por habilidade) |
+| `entrada/`      | mouse/toque e arrastar o mapa                                                                         |
+| `menus/`        | menu principal, escolha de equipe, pausa, ajuda, tutorial                                             |
 
 ## Como verificar uma mudança
 
-1. `npm run dev`, jogar uma partida contra o Bot e olhar o console (o `Falha` mostra erros na tela).
-2. Antes de distribuir: `npm run build` e testar com `npm run preview` (ou abrir o arquivo de `dist/` direto).
+1. `npm run checar` (lint + formatação).
+2. `npm run dev`, jogar uma partida contra o Bot e olhar o console (o `Falha` mostra erros na tela).
+3. Antes de distribuir: `npm run build` e testar com `npm run preview` (ou abrir o arquivo de `dist/` direto).

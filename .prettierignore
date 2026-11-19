@@ -1,0 +1,7 @@
+node_modules/
+dist/
+package-lock.json
+# HTML fica como está: o Prettier mexeria em espaços entre elementos (pode mudar o visual).
+src/index.html
+# Arquivo original de antes da organização.
+PlayZinordia_*.html

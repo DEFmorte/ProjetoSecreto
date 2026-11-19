@@ -8,13 +8,21 @@
     "dev": "vite",
     "dev:rede": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "formatar": "prettier --write .",
+    "checar-formato": "prettier --check .",
+    "checar": "npm run lint && npm run checar-formato"
   },
   "dependencies": {
     "peerjs": "1.5.4"
   },
   "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.14.0",
+    "globals": "17.14.0",
     "postcss": "8.5.33",
+    "prettier": "3.9.10",
     "tailwindcss": "3.4.19",
     "vite": "8.3.5",
     "vite-plugin-singlefile": "2.3.4"

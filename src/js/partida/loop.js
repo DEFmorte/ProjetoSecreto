@@ -1,11 +1,19 @@
+// ── Laço de desenho e início da partida ──
+// gameRunning, startLoop/stopLoop (requestAnimationFrame) e startGame (fecha o menu e começa).
 import { $ } from '../nucleo/dom.js';
 import { beginMatch } from './sorteio.js';
 import { gameLoop } from '../render/cena.js';
 
 export let gameRunning = false;
-export function definirGameRunning(valor) { gameRunning = valor; return valor; } // para outros módulos trocarem "gameRunning"
+export function definirGameRunning(valor) {
+    gameRunning = valor;
+    return valor;
+} // para outros módulos trocarem "gameRunning"
 export let loopHandle = null;
-export function definirLoopHandle(valor) { loopHandle = valor; return valor; } // para outros módulos trocarem "loopHandle"
+export function definirLoopHandle(valor) {
+    loopHandle = valor;
+    return valor;
+} // para outros módulos trocarem "loopHandle"
 
 export function stopLoop() {
     if (loopHandle) cancelAnimationFrame(loopHandle);

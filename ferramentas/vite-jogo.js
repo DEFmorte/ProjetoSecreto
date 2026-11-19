@@ -10,8 +10,10 @@ import { fileURLToPath } from 'node:url';
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(RAIZ, 'src');
 
-const CSP_BUILD = "default-src 'none'; script-src 'unsafe-inline'; worker-src blob:; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src https://0.peerjs.com wss://0.peerjs.com; base-uri 'none'; form-action 'none'";
-const CSP_DEV = "default-src 'self'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: https://0.peerjs.com wss://0.peerjs.com; base-uri 'none'; form-action 'none'";
+const CSP_BUILD =
+    "default-src 'none'; script-src 'unsafe-inline'; worker-src blob:; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src https://0.peerjs.com wss://0.peerjs.com; base-uri 'none'; form-action 'none'";
+const CSP_DEV =
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: https://0.peerjs.com wss://0.peerjs.com; base-uri 'none'; form-action 'none'";
 
 const versaoPacote = () => JSON.parse(fs.readFileSync(path.join(RAIZ, 'package.json'), 'utf8')).version;
 
@@ -35,10 +37,15 @@ export function jogo() {
     return {
         name: 'teste-z',
         enforce: 'post',
-        configResolved(cfg) { build = cfg.command === 'build'; },
+        configResolved(cfg) {
+            build = cfg.command === 'build';
+        },
         transformIndexHtml(html) {
             return html
-                .replace(/(<meta http-equiv="Content-Security-Policy" content=")[^"]*(">)/, (_, a, b) => a + (build ? CSP_BUILD : CSP_DEV) + b)
+                .replace(
+                    /(<meta http-equiv="Content-Security-Policy" content=")[^"]*(">)/,
+                    (_, a, b) => a + (build ? CSP_BUILD : CSP_DEV) + b,
+                )
                 .replace(/(<meta name="versao-jogo" content=")[^"]*(">)/, (_, a, b) => a + versaoDoCodigo() + b);
         },
         generateBundle(_, bundle) {

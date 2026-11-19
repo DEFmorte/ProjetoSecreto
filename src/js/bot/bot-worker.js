@@ -6,7 +6,11 @@
 import WorkerDoBot from './worker.js?worker&inline';
 
 export const BotWorker = {
-    w: null, falhou: false, seq: 0, espera: null, timer: null,
+    w: null,
+    falhou: false,
+    seq: 0,
+    espera: null,
+    timer: null,
     limiteMs: 15000, // sem resposta nesse tempo: desiste do Worker
     // Cria o Worker na primeira vez (true = disponível).
     iniciar() {
@@ -16,8 +20,13 @@ export const BotWorker = {
             if (typeof Worker !== 'function' || typeof Blob !== 'function') throw new Error('navegador sem Worker');
             this.w = new WorkerDoBot();
             this.w.onmessage = (e) => this.resposta(e.data);
-            this.w.onerror = (e) => { if (e && e.preventDefault) e.preventDefault(); this.desistir(e && e.message || 'erro no Worker'); };
-        } catch (e) { this.desistir(e && e.message || e); }
+            this.w.onerror = (e) => {
+                if (e && e.preventDefault) e.preventDefault();
+                this.desistir((e && e.message) || 'erro no Worker');
+            };
+        } catch (e) {
+            this.desistir((e && e.message) || e);
+        }
         return !!this.w;
     },
     desistir(motivo) {
@@ -26,9 +35,14 @@ export const BotWorker = {
         this.encerrar();
     },
     encerrar() {
-        clearTimeout(this.timer); this.timer = null;
-        if (this.w) { this.w.terminate(); this.w = null; }
-        const e = this.espera; this.espera = null;
+        clearTimeout(this.timer);
+        this.timer = null;
+        if (this.w) {
+            this.w.terminate();
+            this.w = null;
+        }
+        const e = this.espera;
+        this.espera = null;
         if (e) e.nao('cancelado');
     },
     // Uma pergunta por vez: uma nova cancela a anterior (o Worker é recriado, para não esperar a conta velha).
@@ -45,11 +59,16 @@ export const BotWorker = {
     resposta(m) {
         const e = this.espera;
         if (!e || !m || m.id !== e.id) return;
-        clearTimeout(this.timer); this.timer = null;
+        clearTimeout(this.timer);
+        this.timer = null;
         this.espera = null;
         this.ultimoMs = m.ms;
-        if (m.erro) { console.error('Bot (Worker):', m.erro); e.nao(new Error(m.erro)); }
-        else e.sim(m.acao || null);
+        if (m.erro) {
+            console.error('Bot (Worker):', m.erro);
+            e.nao(new Error(m.erro));
+        } else e.sim(m.acao || null);
     },
-    cancelar() { if (this.espera) this.encerrar(); }
+    cancelar() {
+        if (this.espera) this.encerrar();
+    },
 };

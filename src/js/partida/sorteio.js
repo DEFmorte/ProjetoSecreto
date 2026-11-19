@@ -1,3 +1,5 @@
+// ── Sorteio da ordem dos turnos ──
+// Tela com a ordem sorteada antes da 1ª jogada e beginMatch (começa a partida).
 import { CONFIG } from '../motor/config.js';
 import { Engine } from '../motor/engine.js';
 import { definirState, definirUndoStack, state } from './estado.js';
@@ -14,27 +16,45 @@ import { definirGameRunning, gameRunning, startLoop } from './loop.js';
 import { VFX } from '../render/vfx.js';
 import { fecharPausa } from '../menus/pausa.js';
 
-// estadoJson: estado inicial vindo do anfitrião (convidado online).
-// desfazer: pilha de desfazer restaurada (Continuar partida).
 // ── Sorteio da ordem dos turnos ──
 // Ao criar a partida (newState), a ordem de todos os jogadores é sorteada (state.ordem) e vale a partida toda.
 // Esta tela mostra o resultado com uma animação curta antes da 1ª jogada; o Bot espera ela fechar.
 // Online, cada aparelho mostra a mesma ordem (vem no estado do anfitrião) e a tela fecha sozinha após alguns segundos.
 export const Sorteio = {
-    el: null, timers: [], girando: false, ordem: [],
+    el: null,
+    timers: [],
+    girando: false,
+    ordem: [],
     tempo: { giroMin: 55, giroMax: 190, porVaga: 1000, online: 6 }, // ms; online: segundos até fechar sozinha
-    sortear(lista) { // embaralha (Fisher–Yates)
+    sortear(lista) {
+        // embaralha (Fisher–Yates)
         const a = [...lista];
-        for (let i = a.length - 1; i > 0; i--) { const k = Math.floor(Engine.rng() * (i + 1)); [a[i], a[k]] = [a[k], a[i]]; }
+        for (let i = a.length - 1; i > 0; i--) {
+            const k = Math.floor(Engine.rng() * (i + 1));
+            [a[i], a[k]] = [a[k], a[i]];
+        }
         return a;
     },
-    aberto() { return !!this.el; },
+    aberto() {
+        return !!this.el;
+    },
     // Mostra só no começo de verdade: 1ª rodada, ninguém agiu ainda (partida guiada não sorteia).
     deveMostrar(s) {
-        return !Tutorial.partida && !!s && Array.isArray(s.ordem) && s.ordem.length > 1 && s.ordem.every(j => CONFIG.players[j]) && s.round === 1 && s.blockIndex === 0
-            && !s.winner && s.pieces.every(p => !p.turn || !p.turn.activated);
+        return (
+            !Tutorial.partida &&
+            !!s &&
+            Array.isArray(s.ordem) &&
+            s.ordem.length > 1 &&
+            s.ordem.every((j) => CONFIG.players[j]) &&
+            s.round === 1 &&
+            s.blockIndex === 0 &&
+            !s.winner &&
+            s.pieces.every((p) => !p.turn || !p.turn.activated)
+        );
     },
-    voce(j) { return Rede.ativo() ? j === Rede.eu : !Bot.ehBot(j); },
+    voce(j) {
+        return Rede.ativo() ? j === Rede.eu : !Bot.ehBot(j);
+    },
     pintar(li, j, fixo) {
         const t = CONFIG.players[j];
         li.style.setProperty('--borda', t.bannerBorder);
@@ -44,7 +64,9 @@ export const Sorteio = {
         li.classList.toggle('girando', !fixo);
         li.classList.toggle('fixo', fixo);
     },
-    depois(fn, ms) { this.timers.push(setTimeout(fn, ms)); },
+    depois(fn, ms) {
+        this.timers.push(setTimeout(fn, ms));
+    },
     mostrar(s) {
         this.fechar(false);
         this.ordem = [...s.ordem];
@@ -65,17 +87,28 @@ export const Sorteio = {
         this.girando = true;
         const vagas = [...tela.querySelectorAll('li')];
         const semAnimacao = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (semAnimacao) { this.revelar(); return; }
+        if (semAnimacao) {
+            this.revelar();
+            return;
+        }
         // Cada vaga "gira" entre os jogadores que sobraram e para no sorteado; a última sai sozinha.
         const vaga = (i) => {
             if (!this.el || !this.girando) return;
-            if (i >= this.ordem.length - 1) { this.revelar(); return; }
-            const resto = this.ordem.slice(i), inicio = performance.now();
+            if (i >= this.ordem.length - 1) {
+                this.revelar();
+                return;
+            }
+            const resto = this.ordem.slice(i),
+                inicio = performance.now();
             let n = 0;
             const girar = () => {
                 if (!this.el || !this.girando) return;
                 const f = Math.min(1, (performance.now() - inicio) / this.tempo.porVaga);
-                if (f >= 1) { this.pintar(vagas[i], this.ordem[i], true); this.depois(() => vaga(i + 1), 260); return; }
+                if (f >= 1) {
+                    this.pintar(vagas[i], this.ordem[i], true);
+                    this.depois(() => vaga(i + 1), 260);
+                    return;
+                }
                 this.pintar(vagas[i], resto[n++ % resto.length], false);
                 this.depois(girar, this.tempo.giroMin + (this.tempo.giroMax - this.tempo.giroMin) * f * f);
             };
@@ -87,36 +120,52 @@ export const Sorteio = {
     // Fim da animação: todas as vagas no lugar, mensagem de quem começa e botão Começar.
     revelar() {
         if (!this.el) return;
-        this.timers.forEach(clearTimeout); this.timers = [];
+        this.timers.forEach(clearTimeout);
+        this.timers = [];
         this.girando = false;
         const vagas = [...this.el.querySelectorAll('li')];
-        this.ordem.forEach((j, i) => { if (!vagas[i].classList.contains('fixo')) this.pintar(vagas[i], j, true); });
+        this.ordem.forEach((j, i) => {
+            if (!vagas[i].classList.contains('fixo')) this.pintar(vagas[i], j, true);
+        });
         const j1 = this.ordem[0];
-        this.el.querySelector('.sorteio-res').innerText = this.voce(j1) ? 'Você começa!' : `${CONFIG.players[j1].label} começa!`;
+        this.el.querySelector('.sorteio-res').innerText = this.voce(j1)
+            ? 'Você começa!'
+            : `${CONFIG.players[j1].label} começa!`;
         const rotulo = this.el.querySelector('#btn-sorteio span');
         rotulo.innerText = 'Começar';
-        if (Rede.ativo()) { // online a partida não espera: fecha sozinha
+        if (Rede.ativo()) {
+            // online a partida não espera: fecha sozinha
             let faltam = this.tempo.online;
             const contar = () => {
                 if (!this.el) return;
-                if (faltam <= 0) { this.fechar(); return; }
+                if (faltam <= 0) {
+                    this.fechar();
+                    return;
+                }
                 rotulo.innerText = `Começar (${faltam--})`;
                 this.depois(contar, 1000);
             };
             contar();
         }
     },
-    avancar() { if (this.girando) this.revelar(); else this.fechar(); },
+    avancar() {
+        if (this.girando) this.revelar();
+        else this.fechar();
+    },
     fechar(retomar = true) {
-        this.timers.forEach(clearTimeout); this.timers = [];
+        this.timers.forEach(clearTimeout);
+        this.timers = [];
         this.girando = false;
         if (!this.el) return;
         this.el.remove();
         this.el = null;
         if (retomar && gameRunning && state) Bot.agendar();
-    }
+    },
 };
 
+// Começa a partida (ou retoma).
+// estadoJson: estado inicial vindo do anfitrião (convidado online).
+// desfazer: pilha de desfazer restaurada (Continuar partida).
 export function beginMatch(estadoJson = null, desfazer = null) {
     ui.pinId = ui.hoverId = null; // ids se repetem entre partidas
     definirUndoStack(Array.isArray(desfazer) ? [...desfazer] : []);
@@ -125,13 +174,21 @@ export function beginMatch(estadoJson = null, desfazer = null) {
     aplicarMapa(state.mapa || 'classico', true);
     Bot.prepararPartida();
     definirGameRunning(true);
-    ui.vis = null; ui.floats = []; ui.anims = {}; ui.vitoriaVista = null; VFX.limpar();
+    ui.vis = null;
+    ui.floats = [];
+    ui.anims = {};
+    ui.vitoriaVista = null;
+    VFX.limpar();
     fecharPausa();
     afterStateChange();
     startLoop();
     // Partida nova (ou convidado online recebendo o início): mostra o sorteio. "Continuar partida" não repete.
-    if ((!estadoJson || Rede.ativo()) && Sorteio.deveMostrar(state)) Sorteio.mostrar(state); else Sorteio.fechar(false);
-    if (Rede.papel === 'anfitriao') { Rede.votos = {}; Rede.enviar({ t: 'inicio', estado: snapshot() }); }
+    if ((!estadoJson || Rede.ativo()) && Sorteio.deveMostrar(state)) Sorteio.mostrar(state);
+    else Sorteio.fechar(false);
+    if (Rede.papel === 'anfitriao') {
+        Rede.votos = {};
+        Rede.enviar({ t: 'inicio', estado: snapshot() });
+    }
     Rede.iniciando = false;
     Rede.atualizarStatus();
 }

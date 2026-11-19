@@ -1,3 +1,5 @@
+// ── Seleção de Estrela e de alvo ──
+// Clicar numa Estrela, entrar no modo de uma habilidade, trocar o pagamento e escolher o alvo.
 import { CONFIG } from '../motor/config.js';
 import { Rules } from '../motor/regras.js';
 import { Engine } from '../motor/engine.js';
@@ -5,11 +7,12 @@ import { state } from '../partida/estado.js';
 import { resolveChoice, useAbility } from '../partida/acoes.js';
 import { ui } from './ui.js';
 import { COR } from './icones.js';
-import { refreshHUD, updateActionBar } from '../hud/hud.js';
+import { refreshHUD } from '../hud/hud.js';
 import { updateStatsPanel } from '../hud/cartoes.js';
+import { updateActionBar } from '../hud/turno.js';
 
 export function selectedPiece() {
-    return state && ui.selectedId != null ? state.pieces.find(p => p.id === ui.selectedId) : null;
+    return state && ui.selectedId != null ? state.pieces.find((p) => p.id === ui.selectedId) : null;
 }
 
 export function selectPiece(piece) {
@@ -55,8 +58,16 @@ export function trocarPagamento(modo = null) {
 // Custo da habilidade em HTML: ◆Âmago, + recurso adicional ou "/ recurso" alternativo.
 export function custoHTML(piece, a, car = null) {
     const c = car || Engine.caracteristicas(piece, a);
-    const rec = (x, sep) => { const r = CONFIG.recursos[x.recurso] || {}; return ` <span style="color:${r.cor}">${sep}${r.icone || ''}${x.valor}</span>`; };
-    const repete = a.repeteCom && state && piece.turn && (piece.turn.usos[a.id] || 0) > 0 && Engine.slot(state, piece, a) === 'repeticao'; // Disparo Arcano repetido
+    const rec = (x, sep) => {
+        const r = CONFIG.recursos[x.recurso] || {};
+        return ` <span style="color:${r.cor}">${sep}${r.icone || ''}${x.valor}</span>`;
+    };
+    const repete =
+        a.repeteCom &&
+        state &&
+        piece.turn &&
+        (piece.turn.usos[a.id] || 0) > 0 &&
+        Engine.slot(state, piece, a) === 'repeticao'; // Disparo Arcano repetido
     return `<span style="color:${COR.amago}">◆${c.custo}</span>${a.custoAdicional ? rec(a.custoAdicional, '+') : ''}${repete ? rec(a.repeteCom, '+') : ''}${a.custoAlternativo ? rec(a.custoAlternativo, '/ ') : ''}`;
 }
 
@@ -70,8 +81,10 @@ export function handleTargetClick(hex) {
     if (!state || state.winner) return false;
     if (state.pending) {
         if (state.pending.tipo === 'escolha') {
-            const t = Rules.pieceAt(state, hex.q, hex.r), k = `${hex.q},${hex.r}`;
-            if (state.pending.opcoes.includes(k)) resolveChoice(k); // zona (ex.: Dar no Pé)
+            const t = Rules.pieceAt(state, hex.q, hex.r),
+                k = `${hex.q},${hex.r}`;
+            if (state.pending.opcoes.includes(k))
+                resolveChoice(k); // zona (ex.: Dar no Pé)
             else if (t && state.pending.opcoes.includes(t.id)) resolveChoice(t.id);
         }
         return true;
@@ -80,9 +93,18 @@ export function handleTargetClick(hex) {
         const piece = selectedPiece();
         const a = Engine.def(ui.mode.abilityId);
         if (piece && a) {
-            const res = Engine.choiceFromHex(state, piece, Engine.alvoDe(piece, a), hex, Engine.restrict(state, piece, a), ui.mode.etapa);
-            if (res && res.etapa) { ui.mode.etapa = res.etapa; refreshHUD(); }
-            else if (res) useAbility(a.id, res.choice);
+            const res = Engine.choiceFromHex(
+                state,
+                piece,
+                Engine.alvoDe(piece, a),
+                hex,
+                Engine.restrict(state, piece, a),
+                ui.mode.etapa,
+            );
+            if (res && res.etapa) {
+                ui.mode.etapa = res.etapa;
+                refreshHUD();
+            } else if (res) useAbility(a.id, res.choice);
         }
         return true;
     }

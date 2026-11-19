@@ -10,17 +10,18 @@ import { undo } from '../partida/acoes.js';
 import { icRenome } from '../interface/icones.js';
 import { showMenu } from './menu-principal.js';
 import { ehToque, TelaCheia } from '../render/tela.js';
-import { setPreview } from '../hud/hud.js';
 import { gameRunning } from '../partida/loop.js';
 import { beginMatch } from '../partida/sorteio.js';
 import { VFX } from '../render/vfx.js';
 import { mostrarAjuda } from './ajuda.js';
+import { setPreview } from '../hud/habilidades.js';
 
 export function abrirPausa(vitoria = false) {
     if (!gameRunning || !state) return;
     const w = state.winner;
     setPreview(null);
-    const titulo = $('pause-title'), sub = $('pause-sub');
+    const titulo = $('pause-title'),
+        sub = $('pause-sub');
     const box = $('pause-buttons');
     box.innerHTML = '';
     const botao = (txt, kbd, cls, fn) => {
@@ -34,14 +35,24 @@ export function abrirPausa(vitoria = false) {
         const theme = w === 'empate' ? null : CONFIG.players[w];
         titulo.innerText = theme ? `${theme.label} VENCEU!` : 'EMPATE!';
         titulo.style.color = theme ? theme.bannerText : '#e5e7eb';
-        sub.innerHTML = !theme ? 'Nenhuma Estrela ficou de pé.'
-            : state.vencedorRenome === w ? `Chegou primeiro a ${icRenome()} ${Rules.metaRenome(state)} de Renome.`
-            : 'Derrotou todas as Estrelas adversárias.';
-        const sub2 = (t, cor = 'text-gray-400') => `<span class="block text-[10px] font-semibold normal-case tracking-normal ${cor}">${t}</span>`;
+        sub.innerHTML = !theme
+            ? 'Nenhuma Estrela ficou de pé.'
+            : state.vencedorRenome === w
+              ? `Chegou primeiro a ${icRenome()} ${Rules.metaRenome(state)} de Renome.`
+              : 'Derrotou todas as Estrelas adversárias.';
+        const sub2 = (t, cor = 'text-gray-400') =>
+            `<span class="block text-[10px] font-semibold normal-case tracking-normal ${cor}">${t}</span>`;
         if (Rede.ativo()) {
-            const js = Rede.jogadoresSala(), meu = Rede.votos[Rede.eu];
-            const n = op => js.filter(j => Rede.votos[j] === op).length;
-            const opcao = (op, desc, kbd, cls, fn) => botao(`<span class="block">${OPCOES_VOTO[op]}${meu === op ? ' ✓' : ''}</span>${sub2(`${desc} · ${n(op)}/${js.length} votos${meu === op ? ' · seu voto' : ''}`, cls ? 'text-blue-100' : 'text-gray-400')}`, kbd, cls, fn);
+            const js = Rede.jogadoresSala(),
+                meu = Rede.votos[Rede.eu];
+            const n = (op) => js.filter((j) => Rede.votos[j] === op).length;
+            const opcao = (op, desc, kbd, cls, fn) =>
+                botao(
+                    `<span class="block">${OPCOES_VOTO[op]}${meu === op ? ' ✓' : ''}</span>${sub2(`${desc} · ${n(op)}/${js.length} votos${meu === op ? ' · seu voto' : ''}`, cls ? 'text-blue-100' : 'text-gray-400')}`,
+                    kbd,
+                    cls,
+                    fn,
+                );
             const info = document.createElement('p');
             info.className = 'text-[11px] text-gray-400 text-center leading-relaxed';
             info.innerHTML = Rede.textoVotos();
@@ -49,11 +60,20 @@ export function abrirPausa(vitoria = false) {
             opcao('revanche', 'Mesmas equipes', 'Enter', 'primario', jogarDeNovo);
             opcao('nova', 'Todos escolhem novas Estrelas', 'N', '', novaPartida);
         } else {
-            botao(`<span class="block">Jogar de novo</span>${sub2('Mesmas equipes', 'text-blue-100')}`, 'Enter', 'primario', jogarDeNovo);
+            botao(
+                `<span class="block">Jogar de novo</span>${sub2('Mesmas equipes', 'text-blue-100')}`,
+                'Enter',
+                'primario',
+                jogarDeNovo,
+            );
             botao(`<span class="block">Nova partida</span>${sub2('Escolher novas Estrelas')}`, 'N', '', novaPartida);
         }
         botao('Ver tabuleiro', 'Esc', '', fecharPausa);
-        if (undoStack.length && !Rede.ativo()) botao('Desfazer jogada', 'Ctrl+Z', '', () => { fecharPausa(); undo(); });
+        if (undoStack.length && !Rede.ativo())
+            botao('Desfazer jogada', 'Ctrl+Z', '', () => {
+                fecharPausa();
+                undo();
+            });
         botao('Sair para o menu', '', 'perigo', showMenu);
     } else {
         const block = Rules.currentBlock(state);
@@ -62,9 +82,20 @@ export function abrirPausa(vitoria = false) {
         sub.innerText = `Rodada ${state.round} · vez do ${CONFIG.players[(block && block.player) || 1].label}${Rede.ativo() ? ' · online, a partida não para' : Bot.ativo() ? ` · ${Bot.jogadores().length > 1 ? 'Bots' : 'Bot'} ${Bot.nivel().nome}` : ''}`;
         botao('Continuar', 'Esc', 'primario', fecharPausa);
         botao('Como jogar', 'H', '', () => mostrarAjuda(undefined, 'pausa'));
-        botao(`Efeitos visuais: ${VFX.NOMES[VFX.nivel]}`, '', '', () => { VFX.alternar(); abrirPausa(); });
-        if (ehToque() && TelaCheia.disponivel()) botao(TelaCheia.ativa() ? 'Sair da tela cheia' : 'Tela cheia', '', '', () => { fecharPausa(); TelaCheia.alternar(); });
-        if (!Rede.ativo()) botao('Reiniciar partida', '', 'perigo', () => { fecharPausa(); beginMatch(); });
+        botao(`Efeitos visuais: ${VFX.NOMES[VFX.nivel]}`, '', '', () => {
+            VFX.alternar();
+            abrirPausa();
+        });
+        if (ehToque() && TelaCheia.disponivel())
+            botao(TelaCheia.ativa() ? 'Sair da tela cheia' : 'Tela cheia', '', '', () => {
+                fecharPausa();
+                TelaCheia.alternar();
+            });
+        if (!Rede.ativo())
+            botao('Reiniciar partida', '', 'perigo', () => {
+                fecharPausa();
+                beginMatch();
+            });
         botao('Sair para o menu', '', 'perigo', showMenu);
     }
     const tela = $('pause-screen');

@@ -22,6 +22,15 @@ atualiza sozinha (mudanças de CSS entram sem recarregar, então a partida abert
 Para testar no celular (mesmo Wi-Fi): `npm run dev:rede` e abra no celular o endereço "rede local" que aparecer.
 Na primeira vez o Windows pode perguntar se libera o Node no firewall.
 
+## Antes de enviar uma mudança
+
+```powershell
+npm run formatar
+npm run checar
+```
+
+No VS Code, instale as extensões recomendadas (Prettier e ESLint): o código se formata sozinho ao salvar.
+
 ## Gerar o jogo para distribuir
 
 ```powershell

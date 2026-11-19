@@ -5,17 +5,29 @@ import { CONFIG } from '../motor/config.js';
 
 // Estado completo da partida em andamento (null fora de partida). Ver newState() em partida.js.
 export let state = null;
-export function definirState(valor) { state = valor; return valor; }
+export function definirState(valor) {
+    state = valor;
+    return valor;
+}
 
 // Pilha de estados anteriores (JSON) para desfazer jogadas.
 export let undoStack = [];
-export function definirUndoStack(valor) { undoStack = valor; return valor; }
+export function definirUndoStack(valor) {
+    undoStack = valor;
+    return valor;
+}
 
 // Modo de jogo local escolhido no menu (CONFIG.modos, só os contra Bots). Online usa Rede.modo.
 export let modoEscolhido = CONFIG.modoLocalPadrao;
-export function definirModoEscolhido(valor) { modoEscolhido = valor; return valor; }
+export function definirModoEscolhido(valor) {
+    modoEscolhido = valor;
+    return valor;
+}
 
 // Equipes escolhidas na seleção: { jogador: [cores das Estrelas] }.
-export const equipesVazias = () => Object.fromEntries(Object.keys(CONFIG.players).map(j => [j, []]));
+export const equipesVazias = () => Object.fromEntries(Object.keys(CONFIG.players).map((j) => [j, []]));
 export let teams = equipesVazias();
-export function definirTeams(valor) { teams = valor; return valor; }
+export function definirTeams(valor) {
+    teams = valor;
+    return valor;
+}
