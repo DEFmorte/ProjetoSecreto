@@ -4,7 +4,7 @@ Batalha estratégica em grid hexagonal, no navegador. Contra Bots ou online (P2P
 
 ## Primeira vez
 
-Precisa do [Node.js](https://nodejs.org) (20 ou mais novo).
+Precisa do [Node.js](https://nodejs.org) (22.15 ou mais novo).
 
 ```powershell
 npm install
@@ -29,7 +29,19 @@ npm run formatar
 npm run checar
 ```
 
-No VS Code, instale as extensões recomendadas (Prettier e ESLint): o código se formata sozinho ao salvar.
+`checar` roda o ESLint, confere a formatação e roda os testes automáticos (`npm test`). No VS Code, instale as
+extensões recomendadas (Prettier e ESLint): o código se formata sozinho ao salvar.
+
+## Testar o Bot e o balanceamento
+
+```powershell
+npm run simular -- --partidas 50
+```
+
+Joga partidas de Bot contra Bot sem abrir o jogo e mostra: quem venceu, a porcentagem de vitórias de cada Estrela,
+quanto tempo a IA leva para decidir, se ela tentou alguma jogada inválida, se alguma partida travou ou deu erro, e
+quais habilidades ela nunca usou. Opções: `--nivel dificil`, `--modo trio`, `--estrelas Diamante,Lorena` (sempre
+na equipe 1), `--detalhes` (uma linha por partida), `--semente 123` (repete exatamente as mesmas partidas).
 
 ## Gerar o jogo para distribuir
 
@@ -52,7 +64,8 @@ src/
     estrelas/       um arquivo por personagem
     motor/          regras do jogo (sem tela)
     bot/            IA do Bot
-ferramentas/        plugin do Vite (segurança, versão e nome do build)
+testes/             testes automáticos (npm test)
+ferramentas/        plugin do Vite, simulador de partidas
 dist/               saída do build (não vai para o git)
 ```
 

@@ -1,15 +1,15 @@
 // ── Criação e fim de partida ──
 // Estado inicial (newState), modo atual, "Jogar de novo" e "Nova partida".
 import { CONFIG } from '../motor/config.js';
-import { Rules } from '../motor/regras.js';
 import { modoEscolhido, state, teams } from './estado.js';
 import { Tutorial } from '../menus/tutorial.js';
 import { Bot } from '../bot/bot.js';
 import { Rede } from '../online/rede.js';
 import { botNivelEscolhido, escolherModo, sairDaPartida } from '../menus/menu-principal.js';
 import { aplicarMapa } from '../render/tela.js';
-import { beginMatch, Sorteio } from './sorteio.js';
+import { beginMatch } from './sorteio.js';
 import { abrirPausa, fecharPausa, pausaAberta } from '../menus/pausa.js';
+import { Partida } from '../motor/partida.js';
 
 // "Jogar de novo": local ou anfitrião recomeça; o convidado pede ao anfitrião.
 // "Nova partida" (fim de jogo): mesma sala/modo, todos escolhem novas Estrelas.
@@ -66,33 +66,18 @@ export function newState() {
         bots = Rede.ativo() ? [] : botsDoModo(modo);
     aplicarMapa(def.mapa);
     Bot.rotulos(Rede.ativo() ? null : modo);
-    const s = {
+    const botNivel = bots.length ? (Tutorial.partida ? 'normal' : botNivelEscolhido) : null;
+    return Partida.criar({
         modo,
-        mapa: def.mapa,
-        jogadores: [...def.jogadores],
-        pieces: Rules.createPieces(Object.fromEntries(def.jogadores.map((j) => [j, teams[j] || []]))),
-        round: 1,
-        blocks: [],
-        blockIndex: 0,
-        activeId: null,
-        pending: null,
-        triggers: [],
-        efeitoPendente: null,
-        fx: [],
-        fxN: 0, // eventos para os efeitos visuais (ver Engine.fx)
-        log: [
+        equipes: Object.fromEntries(def.jogadores.map((j) => [j, teams[j] || []])),
+        // A partida guiada começa sempre por você.
+        ordem: Tutorial.partida ? [...def.jogadores] : null,
+        botNivel,
+        mensagem:
             def.jogadores.length > 2 || bots.length
-                ? `Partida iniciada · ${def.nome} (${def.desc.toLowerCase()})${bots.length ? ` · nível ${Bot.niveis[Tutorial.partida ? 'normal' : botNivelEscolhido].nome}` : ''}`
+                ? `Partida iniciada · ${def.nome} (${def.desc.toLowerCase()})${bots.length ? ` · nível ${Bot.niveis[botNivel].nome}` : ''}`
                 : 'Partida iniciada',
-        ],
-        winner: null,
-    };
-    if (bots.length) s.botNivel = Tutorial.partida ? 'normal' : botNivelEscolhido;
-    // Ordem dos turnos sorteada antes da partida (vale a partida toda). A partida guiada começa sempre por você.
-    s.ordem = Tutorial.partida ? [...def.jogadores] : Sorteio.sortear(def.jogadores);
-    s.log.push(`Sorteio da ordem: ${s.ordem.map((j, i) => `${i + 1}º ${CONFIG.players[j].label}`).join(', ')}`);
-    Rules.initMatch(s);
-    return s;
+    });
 }
 
 export function snapshot() {

@@ -18,6 +18,7 @@ import { gameRunning } from './loop.js';
 import { VFX } from '../render/vfx.js';
 import { abrirPausa, pausaAberta } from '../menus/pausa.js';
 import { updateActionBar } from '../hud/turno.js';
+import { Partida } from '../motor/partida.js';
 
 function pushUndo() {
     if (Rede.ativo()) return; // online não há desfazer
@@ -26,16 +27,7 @@ function pushUndo() {
 }
 
 function finishChange() {
-    Rules.removeDead(state);
-    state.winner = CONFIG.rules.checkVictory(state);
-    if (state.winner) {
-        state.pending = null;
-        state.triggers = [];
-    } else if (!state.pending) {
-        const act = Rules.activePiece(state);
-        if (act) Rules.autoEndIfExhausted(state, act);
-        Rules.settle(state);
-    }
+    Partida.finalizarJogada(state);
     // online/Bot: quem aplicou redesenha depois de liberar Rules.canSelect
     if (!Rede.aplicando && !Bot.aplicando) afterStateChange();
     return true;

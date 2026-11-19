@@ -8,7 +8,11 @@ Textos, nomes e comentários do código em português.
 - `npm run dev` — Vite em http://localhost:8080 (recarrega sozinho). `npm run dev:rede` expõe na rede local (celular).
 - `npm run build` — gera `dist/PlayZinordia_<versão>.html`, arquivo único e offline (tudo embutido). `npm run preview` serve `dist/`
   (abra `/PlayZinordia_<versão>.html`).
-- `npm run lint` (ESLint) e `npm run formatar` (Prettier). `npm run checar` = lint + conferência de formatação.
+- `npm test` — testes automáticos (Vitest, pasta `testes/`); `npm run test:observar` roda de novo a cada mudança.
+- `npm run simular -- --partidas 50 --nivel dificil` — partidas Bot contra Bot sem tela: vitórias por Estrela,
+  tempo da IA, ações inválidas, partidas travadas e habilidades que a IA nunca usa. `--semente N` repete as mesmas
+  partidas (a semente de uma partida com problema aparece no resultado).
+- `npm run lint` (ESLint) e `npm run formatar` (Prettier). `npm run checar` = lint + formatação + testes.
 - A versão fica em `package.json` (`version`) e dá nome ao arquivo do build.
 
 ## Arquitetura
@@ -39,6 +43,13 @@ Textos, nomes e comentários do código em português.
 - **Estilo:** Prettier (120 colunas, 4 espaços, aspas simples) e ESLint — rode `npm run formatar` antes de commitar
   (ou ative "formatar ao salvar" no VS Code; `.vscode/` já tem a configuração). Textos longos do jogo (descrições)
   ficam numa linha só: use a quebra automática de linha do editor.
+- **Partida pura (`motor/partida.js`):** `Partida.criar({ modo, equipes })`, `Partida.aplicar(s, acao)` e
+  `Partida.finalizarJogada(s)` — a página, a IA, os testes e o simulador usam o mesmo código. `Partida.semente(n)`
+  deixa os sorteios repetíveis (todo sorteio do motor passa por `Engine.rng`; não use `Math.random` no motor).
+- **Testes** (`testes/`): `jogo/estrelas` (configuração das Estrelas), `jogo/habilidades` (cada habilidade de cada
+  Estrela usada em todos os alvos, conferindo o estado depois), `jogo/partida`, `bot/ia` (partidas inteiras). As
+  regras que valem depois de qualquer ação estão em `testes/ajuda.js` (`conferirEstado`). Estrela ou habilidade
+  nova entra nos testes sozinha.
 - **Depuração:** `window.Game` (em `main.js`) expõe estado e ações no console: `Game.state`, `Game.executar(acao)`,
   `Game.IA.decidir(Game.state)`, `Game.undo()`...
 
@@ -63,6 +74,6 @@ Textos, nomes e comentários do código em português.
 
 ## Como verificar uma mudança
 
-1. `npm run checar` (lint + formatação).
+1. `npm run checar` (lint + formatação + testes). Mudou a IA ou o balanceamento? Rode também `npm run simular`.
 2. `npm run dev`, jogar uma partida contra o Bot e olhar o console (o `Falha` mostra erros na tela).
 3. Antes de distribuir: `npm run build` e testar com `npm run preview` (ou abrir o arquivo de `dist/` direto).

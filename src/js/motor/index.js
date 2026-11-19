@@ -5,3 +5,4 @@ export { CONFIG } from './config.js';
 import '../estrelas/index.js';
 export { Rules } from './regras.js';
 export { Engine } from './engine.js';
+export { Partida } from './partida.js';

@@ -4,15 +4,21 @@
   "private": true,
   "description": "Teste Z / PlayZinordia — jogo de tabuleiro hexagonal no navegador.",
   "type": "module",
+  "engines": {
+    "node": ">=22.15"
+  },
   "scripts": {
     "dev": "vite",
     "dev:rede": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest run",
+    "test:observar": "vitest",
+    "simular": "node --import ./ferramentas/node-assets.js ferramentas/simular.js",
     "lint": "eslint .",
     "formatar": "prettier --write .",
     "checar-formato": "prettier --check .",
-    "checar": "npm run lint && npm run checar-formato"
+    "checar": "npm run lint && npm run checar-formato && npm test"
   },
   "dependencies": {
     "peerjs": "1.5.4"
@@ -25,6 +31,7 @@
     "prettier": "3.9.10",
     "tailwindcss": "3.4.19",
     "vite": "8.3.5",
-    "vite-plugin-singlefile": "2.3.4"
+    "vite-plugin-singlefile": "2.3.4",
+    "vitest": "5.1.0"
   }
 }

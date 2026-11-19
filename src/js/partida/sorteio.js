@@ -1,7 +1,6 @@
 // ── Sorteio da ordem dos turnos ──
 // Tela com a ordem sorteada antes da 1ª jogada e beginMatch (começa a partida).
 import { CONFIG } from '../motor/config.js';
-import { Engine } from '../motor/engine.js';
 import { definirState, definirUndoStack, state } from './estado.js';
 import { Tutorial } from '../menus/tutorial.js';
 import { Bot } from '../bot/bot.js';
@@ -15,6 +14,7 @@ import { pixelToHex } from '../render/hex.js';
 import { definirGameRunning, gameRunning, startLoop } from './loop.js';
 import { VFX } from '../render/vfx.js';
 import { fecharPausa } from '../menus/pausa.js';
+import { Partida } from '../motor/partida.js';
 
 // ── Sorteio da ordem dos turnos ──
 // Ao criar a partida (newState), a ordem de todos os jogadores é sorteada (state.ordem) e vale a partida toda.
@@ -27,13 +27,7 @@ export const Sorteio = {
     ordem: [],
     tempo: { giroMin: 55, giroMax: 190, porVaga: 1000, online: 6 }, // ms; online: segundos até fechar sozinha
     sortear(lista) {
-        // embaralha (Fisher–Yates)
-        const a = [...lista];
-        for (let i = a.length - 1; i > 0; i--) {
-            const k = Math.floor(Engine.rng() * (i + 1));
-            [a[i], a[k]] = [a[k], a[i]];
-        }
-        return a;
+        return Partida.sortearOrdem(lista);
     },
     aberto() {
         return !!this.el;

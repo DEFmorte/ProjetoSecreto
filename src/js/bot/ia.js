@@ -7,6 +7,7 @@
 import { CONFIG } from '../motor/config.js';
 import { Rules } from '../motor/regras.js';
 import { Engine } from '../motor/engine.js';
+import { Partida } from '../motor/partida.js';
 
 // Distribuição de probabilidade da soma de `count` dados de `sides` faces: [[soma, probabilidade], ...].
 function distribuicaoDados({ count, sides }) {
@@ -325,20 +326,9 @@ export const IA = {
         this.aplicar(s, passos[i]); // passo impossível (ex.: a Estrela foi derrotada por uma reação) é ignorado
         return this.rodar(s, passos, i + 1, eu, false, prof + 1, folha);
     },
-    // O mesmo que finishChange() faz na partida real.
+    // Fecha a jogada na simulação (o mesmo que a partida real faz: Partida.finalizarJogada).
     finalizar(s) {
-        Rules.removeDead(s);
-        s.winner = CONFIG.rules.checkVictory(s);
-        if (s.winner) {
-            s.pending = null;
-            s.triggers = [];
-            return;
-        }
-        if (!s.pending) {
-            const act = Rules.activePiece(s);
-            if (act) Rules.autoEndIfExhausted(s, act);
-            Rules.settle(s);
-        }
+        Partida.finalizarJogada(s);
     },
     aplicar(s, ac) {
         const p = Rules.pieceById(s, ac.pieceId);
